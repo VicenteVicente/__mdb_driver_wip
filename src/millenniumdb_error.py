@@ -1,0 +1,2 @@
+class MillenniumDBError (Exception):
+    pass

@@ -9,7 +9,7 @@ class ModelId(Enum):
     TOTAL = auto()
 
 class DataType(Enum):
-    NULL_ = 0
+    NULL = 0
     BOOL_FALSE = auto()
     BOOL_TRUE = auto()
     UINT8 = auto()
