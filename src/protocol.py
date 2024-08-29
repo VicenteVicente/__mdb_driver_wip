@@ -36,6 +36,14 @@ class DataType(Enum):
 
     TOTAL = auto()
 
+class RequestType(Enum):
+    RUN = 0
+    PULL = auto()
+    DISCARD = auto()
+    CATALOG = auto()
+
+    TOTAL = auto()
+
 class ResponseType(Enum):
     SUCCESS = 0
     ERROR = auto()
