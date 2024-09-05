@@ -1,12 +1,21 @@
 from enum import Enum, auto
 
-DEFAULT_FETCH_SIZE = 1024
+# 1400 for optimizing the MTU
+# src: https://superuser.com/questions/343107/mtu-is-1500-why-the-first-fragment-length-is-1496-in-ipv6
+DEFAULT_RECV_SIZE = 1400
+
+DRIVER_PREAMBLE_BYTES = b"MDB_DRVR"
+SERVER_PREAMBLE_BYTES = b"MDB_SRVR"
+
+DEFAULT_SOCKET_TIMEOUT = 10.0
+
 
 class ModelId(Enum):
     QUAD_MODEL_ID = 0
     RDF_MODEL_ID = auto()
 
     TOTAL = auto()
+
 
 class DataType(Enum):
     NULL = 0
@@ -36,13 +45,16 @@ class DataType(Enum):
 
     TOTAL = auto()
 
+
 class RequestType(Enum):
-    RUN = 0
-    PULL = auto()
-    DISCARD = auto()
+    QUERY = 0
     CATALOG = auto()
+    CANCEL = auto()
+    UPDATE = auto()
+    AUTH = auto()
 
     TOTAL = auto()
+
 
 class ResponseType(Enum):
     SUCCESS = 0

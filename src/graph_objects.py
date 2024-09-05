@@ -147,7 +147,7 @@ class StringLang:
         return f'"{self.str}"@{self.lang}'
 
 
-class StringDataType:
+class StringDatatype:
     def __init__(self, str: str, datatype: str):
         self.str = str
         self.datatype = IRI(datatype)

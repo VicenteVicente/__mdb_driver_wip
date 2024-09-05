@@ -1,19 +1,26 @@
 import struct
+
 from millenniumdb_error import MillenniumDBError
+
 
 class IOBuffer:
     def __init__(self, arg: bytes):
         if isinstance(arg, (bytes, bytearray)):
             self.buffer = arg
         else:
-            raise MillenniumDBError(f'IOBuffer Error: Invalid argument with type {type(arg).__name__}')
+            raise MillenniumDBError(
+                f"IOBuffer Error: Invalid argument with type {type(arg).__name__}"
+            )
 
         self.length = len(self.buffer)
         self._current_position = 0
 
     def _update_current_position(self, num_bytes: int) -> int:
         if self._current_position + num_bytes > self.length:
-            raise MillenniumDBError('IOBuffer Error: Attempted to perform an operation past the end of the buffer')
+            raise MillenniumDBError(
+                "IOBuffer Error: Attempted to perform an operation past the end of the"
+                " buffer"
+            )
 
         previous_position = self._current_position
         self._current_position += num_bytes
@@ -23,40 +30,69 @@ class IOBuffer:
         return self.buffer[self._update_current_position(1)]
 
     def read_uint16(self) -> int:
-        return int.from_bytes(self.buffer[self._update_current_position(2):self._current_position], 'big')
+        return int.from_bytes(
+            self.buffer[self._update_current_position(2) : self._current_position],
+            "big",
+        )
 
     def read_uint32(self) -> int:
-        return int.from_bytes(self.buffer[self._update_current_position(4):self._current_position], 'big')
+        return int.from_bytes(
+            self.buffer[self._update_current_position(4) : self._current_position],
+            "big",
+        )
 
     def read_uint64(self) -> int:
-        return int.from_bytes(self.buffer[self._update_current_position(8):self._current_position], 'big')
+        return int.from_bytes(
+            self.buffer[self._update_current_position(8) : self._current_position],
+            "big",
+        )
 
     def read_int64(self) -> int:
-        return int.from_bytes(self.buffer[self._update_current_position(8):self._current_position], 'big', signed=True)
+        return int.from_bytes(
+            self.buffer[self._update_current_position(8) : self._current_position],
+            "big",
+            signed=True,
+        )
 
     def read_float(self) -> float:
-        return struct.unpack('>f', self.buffer[self._update_current_position(4):self._current_position])[0]
+        return struct.unpack(
+            ">f", self.buffer[self._update_current_position(4) : self._current_position]
+        )[0]
 
     def read_double(self) -> float:
-        return struct.unpack('>d', self.buffer[self._update_current_position(8):self._current_position])[0]
+        return struct.unpack(
+            ">d", self.buffer[self._update_current_position(8) : self._current_position]
+        )[0]
 
-    def read_slice(self, num_bytes: int) -> 'IOBuffer':
-        return IOBuffer(self.buffer[self._update_current_position(num_bytes):self._current_position])
+    def read_slice(self, num_bytes: int) -> "IOBuffer":
+        return IOBuffer(
+            self.buffer[
+                self._update_current_position(num_bytes) : self._current_position
+            ]
+        )
 
     def read_string(self, num_bytes: int) -> str:
-        return self.buffer[self._update_current_position(num_bytes):self._current_position].decode('utf-8')
+        return self.buffer[
+            self._update_current_position(num_bytes) : self._current_position
+        ].decode("utf-8")
 
     def write_uint8(self, value: int) -> None:
         self.buffer[self._update_current_position(1)] = value
 
     def write_uint16(self, value: int) -> None:
-        self.buffer[self._update_current_position(2):self._current_position] = value.to_bytes(2, 'big')
+        self.buffer[self._update_current_position(2) : self._current_position] = (
+            value.to_bytes(2, "big")
+        )
 
     def write_uint32(self, value: int) -> None:
-        self.buffer[self._update_current_position(4):self._current_position] = value.to_bytes(4, 'big')
+        self.buffer[self._update_current_position(4) : self._current_position] = (
+            value.to_bytes(4, "big")
+        )
 
     def write_bytes(self, value: bytes) -> None:
-        self.buffer[self._update_current_position(len(value)):self._current_position] = value
+        self.buffer[
+            self._update_current_position(len(value)) : self._current_position
+        ] = value
 
     def remaining(self) -> int:
         return self.length - self._current_position
@@ -66,3 +102,6 @@ class IOBuffer:
 
     def reset(self) -> None:
         self._current_position = 0
+
+    def __len__(self):
+        return self.length
