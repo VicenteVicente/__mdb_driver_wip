@@ -1,13 +1,11 @@
 from millenniumdb_error import MillenniumDBError
-from typing import Dict, TypeVar
-
-Value = TypeVar("Value")
-
-RecordShape = Dict[str, Value]
+from typing import Dict, List, Any
 
 
 class Record:
-    def __init__(self, variables, values, variableToIndex):
+    def __init__(
+        self, variables: List[str], values: List[Any], variableToIndex: Dict[str, int]
+    ):
         if len(variables) != len(values):
             raise MillenniumDBError(
                 "Record Error: Number of variables does not match the number of values"
@@ -19,8 +17,8 @@ class Record:
         self.length = len(variables)
 
     def entries(self):
-        for _ in range(self.length):
-            yield (self._variables[_], self._values[_])
+        for i in range(self.length):
+            yield (self._variables[i], self._values[i])
 
     def values(self):
         for value in self._values:
@@ -39,8 +37,11 @@ class Record:
         index = key if isinstance(key, int) else self._variableToIndex.get(key, -1)
         return index >= 0 and index < len(self._values)
 
-    def toObject(self):
+    def to_dict(self):
         res = {}
-        for _ in range(self.length):
-            res[self._variables[_]] = self._values[_]
+        for i in range(self.length):
+            res[self._variables[i]] = self._values[i]
         return res
+
+    def __len__(self):
+        return self.length
