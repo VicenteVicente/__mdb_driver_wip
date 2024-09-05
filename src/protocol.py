@@ -60,5 +60,7 @@ class ResponseType(Enum):
     SUCCESS = 0
     ERROR = auto()
     RECORD = auto()
+    VARIABLES = auto()
+    QUERY_DATA = auto()
 
     TOTAL = auto()
