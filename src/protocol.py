@@ -2,11 +2,13 @@ from enum import Enum, auto
 
 DEFAULT_FETCH_SIZE = 1024
 
+
 class ModelId(Enum):
     QUAD_MODEL_ID = 0
     RDF_MODEL_ID = auto()
 
     TOTAL = auto()
+
 
 class DataType(Enum):
     NULL = 0
@@ -36,17 +38,22 @@ class DataType(Enum):
 
     TOTAL = auto()
 
+
 class RequestType(Enum):
     RUN = 0
     PULL = auto()
     DISCARD = auto()
     CATALOG = auto()
+    CANCEL = auto()
 
     TOTAL = auto()
+
 
 class ResponseType(Enum):
     SUCCESS = 0
     ERROR = auto()
     RECORD = auto()
+    VARIABLES = auto()
+    QUERY_DATA = auto()
 
     TOTAL = auto()
