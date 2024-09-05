@@ -1,2 +1,2 @@
-class MillenniumDBError (Exception):
+class MillenniumDBError(Exception):
     pass

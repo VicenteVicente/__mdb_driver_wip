@@ -1,20 +1,21 @@
-import protocol
-from millenniumdb_error import MillenniumDBError
 from decimal import Decimal
-from iobuffer import IOBuffer
+
+import protocol
 from graph_objects import (
+    IRI,
     DateTime,
     GraphAnon,
     GraphEdge,
     GraphNode,
     GraphPath,
     GraphPathSegment,
-    IRI,
     SimpleDate,
     StringDatatype,
     StringLang,
     Time,
 )
+from iobuffer import IOBuffer
+from millenniumdb_error import MillenniumDBError
 
 
 class MessageDecoder:

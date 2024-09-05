@@ -1,6 +1,7 @@
+from enum import Enum
+
 from iobuffer import IOBuffer
 from millenniumdb_error import MillenniumDBError
-from enum import Enum
 
 
 class ChunkDecoder:
@@ -31,7 +32,8 @@ class ChunkDecoder:
                     break
                 case _:
                     raise MillenniumDBError(
-                        f"ChunkDecoder Error: Invalid state with code 0x{int(self._current_state.value)}"
+                        "ChunkDecoder Error: Invalid state with code"
+                        f" 0x{int(self._current_state.value)}"
                     )
 
     def _handle_header_first_byte(self, iobuffer: IOBuffer):

@@ -1,5 +1,6 @@
+from typing import Any, Dict, List
+
 from millenniumdb_error import MillenniumDBError
-from typing import Dict, List, Any
 
 
 class Record:
