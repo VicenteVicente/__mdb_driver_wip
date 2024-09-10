@@ -1,22 +1,25 @@
 import struct
+from typing import Union
 
 from millenniumdb_error import MillenniumDBError
 
 
 class IOBuffer:
-    def __init__(self, arg: bytes):
+    def __init__(self, arg: Union[bytes, int]):
         if isinstance(arg, (bytes, bytearray)):
             self.buffer = arg
+        elif isinstance(arg, int):
+            self.buffer = bytearray(arg)
         else:
             raise MillenniumDBError(
                 f"IOBuffer Error: Invalid argument with type {type(arg).__name__}"
             )
 
-        self.length = len(self.buffer)
+        self._length = len(self.buffer)
         self._current_position = 0
 
     def _update_current_position(self, num_bytes: int) -> int:
-        if self._current_position + num_bytes > self.length:
+        if self._current_position + num_bytes > self._length:
             raise MillenniumDBError(
                 "IOBuffer Error: Attempted to perform an operation past the end of the"
                 " buffer"
@@ -64,17 +67,12 @@ class IOBuffer:
             ">d", self.buffer[self._update_current_position(8) : self._current_position]
         )[0]
 
-    def read_slice(self, num_bytes: int) -> "IOBuffer":
-        return IOBuffer(
-            self.buffer[
-                self._update_current_position(num_bytes) : self._current_position
-            ]
-        )
-
     def read_string(self, num_bytes: int) -> str:
-        return self.buffer[
-            self._update_current_position(num_bytes) : self._current_position
-        ].decode("utf-8")
+        with memoryview(self.buffer) as view:
+            return str(
+                view[self._update_current_position(num_bytes) : self._current_position],
+                "utf-8",
+            )
 
     def write_uint8(self, value: int) -> None:
         self.buffer[self._update_current_position(1)] = value
@@ -94,8 +92,11 @@ class IOBuffer:
             self._update_current_position(len(value)) : self._current_position
         ] = value
 
+    def used(self) -> int:
+        return self._current_position
+
     def remaining(self) -> int:
-        return self.length - self._current_position
+        return self._length - self._current_position
 
     def has_remaining(self) -> bool:
         return self.remaining() > 0
@@ -104,4 +105,4 @@ class IOBuffer:
         self._current_position = 0
 
     def __len__(self):
-        return self.length
+        return self._length

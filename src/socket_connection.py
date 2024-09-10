@@ -19,8 +19,41 @@ class SocketConnection:
     def sendall(self, iobuffer: IOBuffer) -> None:
         return self._wait_operation(self._socket.sendall, iobuffer.buffer)
 
-    def recv(self, num_bytes: int = protocol.DEFAULT_RECV_SIZE) -> bytes:
-        return self._wait_operation(self._socket.recv, num_bytes)
+    def recvall(self, num_bytes: int) -> bytearray:
+        buffer = bytearray(num_bytes)
+        used = 0
+
+        with memoryview(buffer) as view:
+            num_bytes_recv = self._wait_operation(
+                self._socket.recv_into, view[used:], num_bytes - used
+            )
+
+            if num_bytes_recv == 0:
+                raise MillenniumDBError("SocketConnection Error: no data received")
+
+            used += num_bytes_recv
+
+        return buffer
+
+    def recvall_into(self, iobuffer: IOBuffer, num_bytes: int) -> None:
+        end = iobuffer.used() + num_bytes
+
+        # Extend the buffer if necessary
+        if end > len(iobuffer):
+            iobuffer.buffer += bytearray(end - len(iobuffer))
+
+        with memoryview(iobuffer.buffer) as view:
+            while iobuffer.used() < end:
+                num_bytes_recv = self._wait_operation(
+                    self._socket.recv_into,
+                    view[iobuffer.used() : end],
+                    end - iobuffer.used(),
+                )
+
+                if num_bytes_recv == 0:
+                    raise MillenniumDBError("SocketConnection Error: no data received")
+
+                iobuffer._update_current_position(num_bytes_recv)
 
     def close(self) -> None:
         try:

@@ -1,45 +1,61 @@
-from message_decoder import MessageDecoder
+from functools import wraps
+
+from catalog import Catalog
+from message_receiver import MessageReceiver
+from millenniumdb_error import MillenniumDBError
 from request_builder import RequestBuilder
+from response_handler import ResponseHandler
+from result import Result
 from socket_connection import SocketConnection
 
 
+def _ensure_session_open(func):
+    @wraps(func)
+    def wrapper(self, *args, **kwargs):
+        if not self._open:
+            raise MillenniumDBError("Session Error: session is closed")
+        return func(self, *args, **kwargs)
+
+    return wrapper
+
+
 class Session:
+
     def __init__(self, host: str, port: int):
-        # self._open = True
-        # self._chunk_decoder = ChunkDecoder(this._on_chunks_decoded)
-        self._message_decoder = MessageDecoder()
-        # self._response_handler = ResponseHandler()
+        self._open = True
         self._connection = SocketConnection(host, port)
+        self._message_receiver = MessageReceiver(self._connection)
+        self._response_handler = ResponseHandler()
 
-    def run(self, query: str):  # -> Result:
-        self._connection.sendall(RequestBuilder.run(query))
+    @_ensure_session_open
+    def run(self, query: str) -> Result:
+        return Result(
+            self._connection, self._message_receiver, self._response_handler, query
+        )
 
-        response = []
-        data = self._connection.recv()
-        while data:
-            response.append(data)
-            data = self._connection.recv()
-        # chunk_decoder.decode(xx)
-        # message_decoder.decode(xx)
-        # response_handler.handle(xx)
-
+    @_ensure_session_open
     def catalog(self):
-        self._connection.sendall(RequestBuilder.catalog())
-        while True:
-            data = self._connection.recv()
-            print(data)
-            if not data:
-                print("done")
-                break
+        return Catalog(self._connection, self._message_receiver, self._response_handler)
+
+    @_ensure_session_open
+    def _cancel(self, result: Result) -> None:
+        if result._query_preamble is None:
+            raise MillenniumDBError("Session Error: query has not been executed yet")
+
+        self._connection.sendall(
+            RequestBuilder.cancel(
+                result._query_preamble["workerIndex"],
+                result._query_preamble["cancellationToken"],
+            )
+        )
 
     def close(self):
-        pass
-        # if self._open:
-        # self._open = False
+        if self._open:
+            self._open = False
+            self._connection.close()
 
+    def __enter__(self):
+        return self
 
-session = Session("localhost", 1234)
-query = "MATCH (?X) RETURN * LIMIT 5"
-print(len(query))
-session.run(query)
-session.catalog()
+    def __exit__(self, exc_type, exc_value, exc_traceback):
+        self.close()

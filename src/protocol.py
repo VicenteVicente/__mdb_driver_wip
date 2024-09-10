@@ -1,9 +1,5 @@
 from enum import Enum, auto
 
-# 1400 for optimizing the MTU
-# src: https://superuser.com/questions/343107/mtu-is-1500-why-the-first-fragment-length-is-1496-in-ipv6
-DEFAULT_RECV_SIZE = 1400
-
 DRIVER_PREAMBLE_BYTES = b"MDB_DRVR"
 SERVER_PREAMBLE_BYTES = b"MDB_SRVR"
 
@@ -61,6 +57,5 @@ class ResponseType(Enum):
     ERROR = auto()
     RECORD = auto()
     VARIABLES = auto()
-    QUERY_DATA = auto()
 
     TOTAL = auto()
