@@ -1,6 +1,6 @@
-from iobuffer import IOBuffer
-from millenniumdb_error import MillenniumDBError
-from socket_connection import SocketConnection
+from .iobuffer import IOBuffer
+from .millenniumdb_error import MillenniumDBError
+from .socket_connection import SocketConnection
 
 
 class ChunkDecoder:
@@ -15,6 +15,7 @@ class ChunkDecoder:
             try:
                 chunk_size_bytes = self._connection.recvall(2)
                 chunk_size = chunk_size_bytes[0] << 8 | chunk_size_bytes[1]
+                print("CHUNK_SIZE", chunk_size, chunk_size_bytes)
 
                 # All chunks were received
                 if chunk_size == ChunkDecoder.SEAL:

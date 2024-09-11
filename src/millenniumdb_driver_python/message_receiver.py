@@ -1,7 +1,7 @@
-from chunk_decoder import ChunkDecoder
-from iobuffer import IOBuffer
-from message_decoder import MessageDecoder
-from socket_connection import SocketConnection
+from .chunk_decoder import ChunkDecoder
+from .iobuffer import IOBuffer
+from .message_decoder import MessageDecoder
+from .socket_connection import SocketConnection
 
 
 class MessageReceiver:
@@ -17,6 +17,8 @@ class MessageReceiver:
         # Decode chunks
         self._iobuffer.reset()
         self._chunk_decoder.decode()
+
+        print("BUFFER_CONTENT", self._iobuffer.buffer[: self._iobuffer.used()])
 
         # Decode message
         self._iobuffer.reset()

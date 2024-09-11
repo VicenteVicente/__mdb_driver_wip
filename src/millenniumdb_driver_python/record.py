@@ -1,6 +1,6 @@
-from typing import Dict, Iterator, List, Tuple
+from typing import Dict, List, Tuple
 
-from millenniumdb_error import MillenniumDBError
+from .millenniumdb_error import MillenniumDBError
 
 
 class Record:

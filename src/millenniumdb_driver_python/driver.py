@@ -1,10 +1,10 @@
 from functools import wraps
 from urllib.parse import urlparse
 
-from catalog import Catalog
-from millenniumdb_error import MillenniumDBError
-from result import Result
-from session import Session
+from .catalog import Catalog
+from .millenniumdb_error import MillenniumDBError
+from .result import Result
+from .session import Session
 
 
 def _ensure_driver_open(func):

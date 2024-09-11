@@ -1,9 +1,9 @@
 import socket
 from typing import Any, Callable
 
-import protocol
-from iobuffer import IOBuffer
-from millenniumdb_error import MillenniumDBError
+from . import protocol
+from .iobuffer import IOBuffer
+from .millenniumdb_error import MillenniumDBError
 
 
 class SocketConnection:
@@ -20,20 +20,18 @@ class SocketConnection:
         return self._wait_operation(self._socket.sendall, iobuffer.buffer)
 
     def recvall(self, num_bytes: int) -> bytearray:
-        buffer = bytearray(num_bytes)
-        used = 0
-
-        with memoryview(buffer) as view:
+        iobuffer = IOBuffer(num_bytes)
+        while iobuffer.used() < num_bytes:
             num_bytes_recv = self._wait_operation(
-                self._socket.recv_into, view[used:], num_bytes - used
+                self._socket.recv_into, iobuffer.buffer, num_bytes - iobuffer.used()
             )
 
             if num_bytes_recv == 0:
                 raise MillenniumDBError("SocketConnection Error: no data received")
 
-            used += num_bytes_recv
+            iobuffer._update_current_position(num_bytes_recv)
 
-        return buffer
+        return iobuffer.buffer
 
     def recvall_into(self, iobuffer: IOBuffer, num_bytes: int) -> None:
         end = iobuffer.used() + num_bytes

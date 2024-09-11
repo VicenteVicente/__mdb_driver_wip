@@ -1,8 +1,8 @@
 from decimal import Decimal
 from typing import Dict, List
 
-import protocol
-from graph_objects import (
+from . import protocol
+from .graph_objects import (
     IRI,
     DateTime,
     GraphAnon,
@@ -15,8 +15,8 @@ from graph_objects import (
     StringLang,
     Time,
 )
-from iobuffer import IOBuffer
-from millenniumdb_error import MillenniumDBError
+from .iobuffer import IOBuffer
+from .millenniumdb_error import MillenniumDBError
 
 
 class MessageDecoder:

@@ -1,7 +1,7 @@
 import struct
 from typing import Union
 
-from millenniumdb_error import MillenniumDBError
+from .millenniumdb_error import MillenniumDBError
 
 
 class IOBuffer:
@@ -15,11 +15,10 @@ class IOBuffer:
                 f"IOBuffer Error: Invalid argument with type {type(arg).__name__}"
             )
 
-        self._length = len(self.buffer)
         self._current_position = 0
 
     def _update_current_position(self, num_bytes: int) -> int:
-        if self._current_position + num_bytes > self._length:
+        if self._current_position + num_bytes > len(self):
             raise MillenniumDBError(
                 "IOBuffer Error: Attempted to perform an operation past the end of the"
                 " buffer"
@@ -96,7 +95,7 @@ class IOBuffer:
         return self._current_position
 
     def remaining(self) -> int:
-        return self._length - self._current_position
+        return len(self) - self._current_position
 
     def has_remaining(self) -> bool:
         return self.remaining() > 0
@@ -105,4 +104,4 @@ class IOBuffer:
         self._current_position = 0
 
     def __len__(self):
-        return self._length
+        return len(self.buffer)

@@ -1,5 +1,5 @@
-import protocol
-from iobuffer import IOBuffer
+from . import protocol
+from .iobuffer import IOBuffer
 
 
 class RequestBuilder:

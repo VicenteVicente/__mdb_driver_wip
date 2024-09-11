@@ -1,7 +1,7 @@
-from typing import Callable, Dict
+from typing import Callable, Dict, List
 
-import protocol
-from millenniumdb_error import MillenniumDBError
+from . import protocol
+from .millenniumdb_error import MillenniumDBError
 
 
 class ResponseHandler:

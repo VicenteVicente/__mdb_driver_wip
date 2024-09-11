@@ -1,9 +1,9 @@
-import protocol
-from message_receiver import MessageReceiver
-from millenniumdb_error import MillenniumDBError
-from request_builder import RequestBuilder
-from response_handler import ResponseHandler
-from socket_connection import SocketConnection
+from . import protocol
+from .message_receiver import MessageReceiver
+from .millenniumdb_error import MillenniumDBError
+from .request_builder import RequestBuilder
+from .response_handler import ResponseHandler
+from .socket_connection import SocketConnection
 
 
 class Catalog:

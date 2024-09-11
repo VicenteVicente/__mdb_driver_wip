@@ -2,11 +2,11 @@ from typing import Dict, Iterator, List, Tuple
 
 import pandas as pd
 
-from message_receiver import MessageReceiver
-from record import Record
-from request_builder import RequestBuilder
-from response_handler import ResponseHandler
-from socket_connection import SocketConnection
+from .message_receiver import MessageReceiver
+from .record import Record
+from .request_builder import RequestBuilder
+from .response_handler import ResponseHandler
+from .socket_connection import SocketConnection
 
 
 class Result:

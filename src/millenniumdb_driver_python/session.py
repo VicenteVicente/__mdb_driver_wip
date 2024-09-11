@@ -1,12 +1,12 @@
 from functools import wraps
 
-from catalog import Catalog
-from message_receiver import MessageReceiver
-from millenniumdb_error import MillenniumDBError
-from request_builder import RequestBuilder
-from response_handler import ResponseHandler
-from result import Result
-from socket_connection import SocketConnection
+from .catalog import Catalog
+from .message_receiver import MessageReceiver
+from .millenniumdb_error import MillenniumDBError
+from .request_builder import RequestBuilder
+from .response_handler import ResponseHandler
+from .result import Result
+from .socket_connection import SocketConnection
 
 
 def _ensure_session_open(func):
