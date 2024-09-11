@@ -21,16 +21,22 @@ def _ensure_session_open(func):
 
 class Session:
 
-    def __init__(self, host: str, port: int):
+    def __init__(self, host: str, port: int, driver: "Driver"):
+        self._driver = driver
         self._open = True
         self._connection = SocketConnection(host, port)
         self._message_receiver = MessageReceiver(self._connection)
         self._response_handler = ResponseHandler()
 
     @_ensure_session_open
-    def run(self, query: str) -> Result:
+    def run(self, query: str, timeout: float = 0.0) -> Result:
         return Result(
-            self._connection, self._message_receiver, self._response_handler, query
+            self._driver,
+            self._connection,
+            self._message_receiver,
+            self._response_handler,
+            query,
+            timeout,
         )
 
     @_ensure_session_open

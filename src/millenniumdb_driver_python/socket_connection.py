@@ -1,5 +1,5 @@
 import socket
-from typing import Any, Callable
+from typing import Any, Callable, Union
 
 from . import protocol
 from .iobuffer import IOBuffer
@@ -20,38 +20,26 @@ class SocketConnection:
         return self._wait_operation(self._socket.sendall, iobuffer.buffer)
 
     def recvall(self, num_bytes: int) -> bytearray:
-        iobuffer = IOBuffer(num_bytes)
-        while iobuffer.used() < num_bytes:
-            num_bytes_recv = self._wait_operation(
-                self._socket.recv_into, iobuffer.buffer, num_bytes - iobuffer.used()
-            )
+        buffer = bytearray(num_bytes)
+        self.recvall_into(buffer, num_bytes)
+        return buffer
 
-            if num_bytes_recv == 0:
-                raise MillenniumDBError("SocketConnection Error: no data received")
-
-            iobuffer._update_current_position(num_bytes_recv)
-
-        return iobuffer.buffer
-
-    def recvall_into(self, iobuffer: IOBuffer, num_bytes: int) -> None:
-        end = iobuffer.used() + num_bytes
-
-        # Extend the buffer if necessary
-        if end > len(iobuffer):
-            iobuffer.buffer += bytearray(end - len(iobuffer))
-
-        with memoryview(iobuffer.buffer) as view:
-            while iobuffer.used() < end:
+    def recvall_into(
+        self, buffer: Union[bytes, bytearray, memoryview], num_bytes: int
+    ) -> None:
+        total_bytes_recv = 0
+        with memoryview(buffer) as view:
+            while total_bytes_recv < num_bytes:
                 num_bytes_recv = self._wait_operation(
                     self._socket.recv_into,
-                    view[iobuffer.used() : end],
-                    end - iobuffer.used(),
+                    view[total_bytes_recv:num_bytes],
+                    num_bytes - total_bytes_recv,
                 )
 
                 if num_bytes_recv == 0:
                     raise MillenniumDBError("SocketConnection Error: no data received")
 
-                iobuffer._update_current_position(num_bytes_recv)
+                total_bytes_recv += num_bytes_recv
 
     def close(self) -> None:
         try:

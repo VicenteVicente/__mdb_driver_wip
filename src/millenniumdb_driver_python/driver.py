@@ -37,7 +37,7 @@ class Driver:
 
     @_ensure_driver_open
     def session(self) -> Session:
-        session = Session(self._host, self._port)
+        session = Session(self._host, self._port, self)
         self._sessions.append(session)
         return session
 

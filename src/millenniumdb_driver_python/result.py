@@ -1,3 +1,5 @@
+from threading import Thread
+from time import sleep
 from typing import Dict, Iterator, List, Tuple
 
 import pandas as pd
@@ -12,11 +14,14 @@ from .socket_connection import SocketConnection
 class Result:
     def __init__(
         self,
+        driver: "Driver",
         connection: SocketConnection,
         message_receiver: MessageReceiver,
         response_handler: ResponseHandler,
         query: str,
+        timeout: float,
     ):
+        self._driver = driver
         self._connection = connection
         self._variables = []
         self._query_preamble = None
@@ -26,7 +31,7 @@ class Result:
         self._streaming = True
         self._message_receiver = message_receiver
         self._response_handler = response_handler
-        self._run(query)
+        self._run(query, timeout)
 
     def variables(self) -> Tuple[str]:
         return self._variables
@@ -49,11 +54,20 @@ class Result:
     def __iter__(self) -> Iterator[Record]:
         return iter(self._records)
 
-    def _run(self, query):
+    def _try_cancel(self, timeout) -> None:
+        sleep(timeout)
+        if self._streaming:
+            self._driver.cancel(self)
+
+    def _run(self, query: str, timeout: float) -> None:
         def on_variables(variables, query_preamble) -> None:
             self._variables = variables
             self._query_preamble = query_preamble
             self._variable_to_index = {variables[i]: i for i in range(len(variables))}
+
+            if timeout > 0.0:
+                t = Thread(target=self._try_cancel, args=[timeout], daemon=True)
+                t.start()
 
         def on_record(record) -> None:
             self._records.append(
@@ -65,7 +79,6 @@ class Result:
             self._streaming = False
 
         def on_error(error) -> None:
-            self._error = error
             self._streaming = False
             raise error
 
