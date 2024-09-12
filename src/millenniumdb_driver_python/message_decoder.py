@@ -24,9 +24,9 @@ class MessageDecoder:
         self._iobuffer = iobuffer
 
     def decode(self) -> object:
-        type = self._iobuffer.read_uint8()
+        type_ = self._iobuffer.read_uint8()
 
-        match type:
+        match type_:
 
             case protocol.DataType.NULL.value:
                 return None
@@ -56,99 +56,103 @@ class MessageDecoder:
                 return self._iobuffer.read_double()
 
             case protocol.DataType.DECIMAL.value:
-                decimal_string = self._decode_string(self._iobuffer)
+                decimal_string = self._decode_string()
                 return Decimal(decimal_string)
 
             case protocol.DataType.STRING.value:
-                return self._decode_string(self._iobuffer)
+                return self._decode_string()
 
             case protocol.DataType.STRING_LANG.value:
-                str = self._decode_string(self._iobuffer)
-                lang = self._decode_string(self._iobuffer)
-                return StringLang(str, lang)
+                str_ = self._decode_string()
+                lang = self._decode_string()
+                return StringLang(str_, lang)
 
             case protocol.DataType.STRING_DATATYPE.value:
-                str = self._decode_string(self._iobuffer)
-                datatype = self._decode_string(self._iobuffer)
-                return StringDatatype(str, datatype)
+                str_ = self._decode_string()
+                datatype = self._decode_string()
+                return StringDatatype(str_, datatype)
 
             case protocol.DataType.IRI.value:
-                iri = self._decode_string(self._iobuffer)
+                iri = self._decode_string()
                 return IRI(iri)
 
             case protocol.DataType.LIST.value:
-                return self._decode_list(self._iobuffer)
+                return self._decode_list()
 
             case protocol.DataType.MAP.value:
-                return self._decode_map(self._iobuffer)
+                return self._decode_map()
 
             case protocol.DataType.NAMED_NODE.value:
-                nodeId = self._decode_string(self._iobuffer)
-                return GraphNode(nodeId)
+                node_id = self._decode_string()
+                return GraphNode(node_id)
 
             case protocol.DataType.EDGE.value:
-                edgeId = self._decode_string(self._iobuffer)
-                return GraphEdge(edgeId)
+                edge_id = self._decode_string()
+                return GraphEdge(edge_id)
 
             case protocol.DataType.ANON.value:
-                anonId = self._decode_string(self._iobuffer)
-                return GraphAnon(anonId)
+                anon_id = self._decode_string()
+                return GraphAnon(anon_id)
 
             case protocol.DataType.DATE.value:
-                year = self.decode()
-                month = self.decode()
-                day = self.decode()
-                tzMinuteOffset = self.decode()
-                return SimpleDate(year, month, day, tzMinuteOffset)
+                year = self._iobuffer.read_int64()
+                month = self._iobuffer.read_int64()
+                day = self._iobuffer.read_int64()
+                tz_minute_offset = self._iobuffer.read_int64()
+                return SimpleDate(year, month, day, tz_minute_offset)
 
             case protocol.DataType.TIME.value:
-                hour = self.decode()
-                minute = self.decode()
-                second = self.decode()
-                tzMinuteOffset = self.decode()
-                return Time(hour, minute, second, tzMinuteOffset)
+                hour = self._iobuffer.read_int64()
+                minute = self._iobuffer.read_int64()
+                second = self._iobuffer.read_int64()
+                tz_minute_offset = self._iobuffer.read_int64()
+                return Time(hour, minute, second, tz_minute_offset)
 
             case protocol.DataType.DATETIME.value:
-                year = self.decode()
-                month = self.decode()
-                day = self.decode()
-                hour = self.decode()
-                minute = self.decode()
-                second = self.decode()
-                tzMinuteOffset = self.decode()
-                return DateTime(year, month, day, hour, minute, second, tzMinuteOffset)
+                year = self._iobuffer.read_int64()
+                month = self._iobuffer.read_int64()
+                day = self._iobuffer.read_int64()
+                hour = self._iobuffer.read_int64()
+                minute = self._iobuffer.read_int64()
+                second = self._iobuffer.read_int64()
+                tz_minute_offset = self._iobuffer.read_int64()
+                return DateTime(
+                    year, month, day, hour, minute, second, tz_minute_offset
+                )
 
             case protocol.DataType.PATH.value:
-                pathLength = self._iobuffer.read_uint32()
-                if pathLength == 0:
+                path_length = self._iobuffer.read_uint32()
+                if path_length == 0:
                     node = self.decode()
                     return GraphPath(node, node, [])
-                pathSegments = []
+                path_segments = []
                 from_ = self.decode()
                 start = from_
-                for _ in range(pathLength):
-                    reverse = self.decode()
-                    type = self.decode()
+                for _ in range(path_length):
+                    reverse = (
+                        self._iobuffer.read_uint8() == protocol.DataType.BOOL_TRUE.value
+                    )
+                    type_ = self.decode()
                     to = self.decode()
-                    pathSegments.append(GraphPathSegment(from_, to, type, reverse))
+                    path_segments.append(GraphPathSegment(from_, to, type_, reverse))
                     from_ = to
                 end = from_
-                return GraphPath(start, end, pathSegments)
+                return GraphPath(start, end, path_segments)
 
             case _:
                 raise MillenniumDBError(
-                    f"MessageDecoder Error: Unhandled DataType with code: 0x{type:02x}"
+                    f"MessageDecoder Error: Unhandled DataType with code: 0x{type_:02x}"
                 )
 
-    def _decode_string(self, iobuffer: IOBuffer) -> str:
+    def _decode_string(self) -> str:
         size = self._iobuffer.read_uint32()
         return self._iobuffer.read_string(size)
 
-    def _decode_list(self, iobuffer: IOBuffer) -> List:
+    def _decode_list(self) -> List:
         size = self._iobuffer.read_uint32()
         return [self.decode() for _ in range(size)]
 
-    def _decode_map(self, iobuffer: IOBuffer) -> Dict[str, object]:
+    def _decode_map(self) -> Dict[str, object]:
         size = self._iobuffer.read_uint32()
         res = {}
         for _ in range(size):
@@ -157,7 +161,7 @@ class MessageDecoder:
                 raise MillenniumDBError(
                     "MessageDecoder Error: Map keys must be a string"
                 )
-            key = self._decode_string(self._iobuffer)
+            key = self._decode_string()
             value = self.decode()
             res[key] = value
         return res
