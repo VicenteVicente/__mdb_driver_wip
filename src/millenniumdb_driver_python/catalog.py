@@ -21,11 +21,11 @@ class Catalog:
         self._catalog()
 
     @property
-    def model_id(self):
+    def model_id(self) -> int:
         return self._model_id
 
     @property
-    def version(self):
+    def version(self) -> int:
         return self._version
 
     def _catalog(self):
