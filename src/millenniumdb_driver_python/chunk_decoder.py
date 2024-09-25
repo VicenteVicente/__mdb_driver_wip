@@ -11,28 +11,19 @@ class ChunkDecoder:
         self._iobuffer = iobuffer
 
     def decode(self):
-        current_pos = 0
-        while True:
-            try:
-                chunk_size_bytes = self._connection.recvall(2)
-                chunk_size = chunk_size_bytes[0] << 8 | chunk_size_bytes[1]
+        try:
+            # Get first chunk size
+            self._connection.recvall_into(self._iobuffer, 2)
+            chunk_size = self._iobuffer.pop_uint16()
 
-                # All chunks were received
-                if chunk_size == ChunkDecoder.SEAL:
-                    return
+            # Decode all the chunks until we reach the SEAL
+            while chunk_size != ChunkDecoder.SEAL:
+                # Receive current chunk and next chunk size in the same recv call
+                self._connection.recvall_into(
+                    self._iobuffer,
+                    chunk_size + 2,
+                )
+                chunk_size = self._iobuffer.pop_uint16()
 
-                remaining = len(self._iobuffer) - current_pos
-                if chunk_size > remaining:
-                    self._iobuffer.buffer.extend(bytearray(chunk_size - remaining))
-
-                with memoryview(self._iobuffer.buffer) as view:
-                    self._connection.recvall_into(
-                        view[current_pos : current_pos + chunk_size],
-                        chunk_size,
-                    )
-                current_pos += chunk_size
-
-            except Exception as e:
-                raise MillenniumDBError(
-                    "ChunkDecoder Error: could not decode chunk"
-                ) from e
+        except Exception as e:
+            raise MillenniumDBError("ChunkDecoder Error: could not decode chunk") from e
