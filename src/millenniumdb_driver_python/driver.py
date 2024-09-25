@@ -7,6 +7,7 @@ from .result import Result
 from .session import Session
 
 
+# Ensure that the driver is open before executing a function
 def _ensure_driver_open(func):
     @wraps(func)
     def wrapper(self, *args, **kwargs):
@@ -17,6 +18,8 @@ def _ensure_driver_open(func):
     return wrapper
 
 
+# A driver that manages sessions and connections sending
+# queries and receiving results from the MillenniumDB server
 class Driver:
     def __init__(self, url: str):
         parsed_url = urlparse(url)
@@ -26,11 +29,13 @@ class Driver:
         self._sessions = []
 
     @_ensure_driver_open
+    # Get the catalog of the MillenniumDB server
     def catalog(self) -> Catalog:
         with self.session() as session:
             return session.catalog()
 
     @_ensure_driver_open
+    # Cancel a running query on the server
     def cancel(self, result: Result) -> None:
         with self.session() as session:
             session._cancel(result)

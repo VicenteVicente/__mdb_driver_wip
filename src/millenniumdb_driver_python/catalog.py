@@ -13,9 +13,9 @@ class Catalog:
         message_receiver: MessageReceiver,
         response_handler: ResponseHandler,
     ):
-        self._connection = connection
-        self._message_receiver = message_receiver
-        self._response_handler = response_handler
+        self._connection = connection  # The Socket connection
+        self._message_receiver = message_receiver  # The Receiver of incoming messages
+        self._response_handler = response_handler  # The Handler of the responses
         self._model_id = None
         self._version = None
         self._catalog()
@@ -36,6 +36,7 @@ class Catalog:
         def on_error(error) -> None:
             raise MillenniumDBError(error)
 
+        # Add success and error observers to the response handler
         self._response_handler.add_observer(
             {"on_success": on_success, "on_error": on_error}
         )

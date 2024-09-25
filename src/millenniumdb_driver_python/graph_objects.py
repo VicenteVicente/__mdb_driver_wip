@@ -1,9 +1,10 @@
 from typing import List
 
 
+# Represents a node in the graph
 class GraphNode:
     def __init__(self, id: str):
-        self.id = id
+        self.id = id  # The node identifier
 
     def __str__(self):
         return self.id
@@ -12,9 +13,10 @@ class GraphNode:
         return f"GraphNode<{str(self)}>"
 
 
+# Represents an edge in the graph
 class GraphEdge:
     def __init__(self, id: str):
-        self.id = id
+        self.id = id  # The edge identifier
 
     def __str__(self):
         return self.id
@@ -23,9 +25,10 @@ class GraphEdge:
         return f"GraphEdge<{str(self)}>"
 
 
+# Represents an anonymous node in the graph
 class GraphAnon:
     def __init__(self, id: str):
-        self.id = id
+        self.id = id  # The anonymous node identifier
 
     def __str__(self):
         return self.id
@@ -127,14 +130,20 @@ class DateTime:
         return f"DateTime<{str(self)}>"
 
 
+# Represents a segment in the path
 class GraphPathSegment:
     def __init__(self, from_: object, to: object, type: object, reverse: bool) -> None:
-        self.from_ = from_
-        self.to = to
-        self.type = type
+        self.from_ = from_  # The starting node of the segment
+        self.to = to  # The ending node of the segment
+        self.type = type  # The type of the segment
+
+        # Whether the segment is in reverse direction,
+        # for example the segment should be printed
+        # as `(to)<-[type]-(from)` instead of `(from)-[type]->(to)`
         self.reverse = reverse
 
 
+# Represents a path in the graph
 class GraphPath:
     def __init__(
         self,
@@ -142,10 +151,10 @@ class GraphPath:
         end: object,
         segments: List[GraphPathSegment],
     ) -> None:
-        self.start = start
-        self.end = end
-        self.segments = segments
-        self.length = len(segments)
+        self.start = start  # The starting node of the path
+        self.end = end  # The ending node of the path
+        self.segments = segments  # The segments of the path
+        self.length = len(segments)  # The number of segments in the path
 
     def __repr__(self) -> str:
         return f"GraphPath<length={self.length}>"
