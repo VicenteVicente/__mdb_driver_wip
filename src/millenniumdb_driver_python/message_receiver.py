@@ -32,7 +32,7 @@ class MessageReceiver:
 
         msg = self.receive()
         while msg["type"] == protocol.ResponseType.RECORD.value:
-            records.append(msg)
+            records.append(msg["payload"])
             msg = self.receive()
 
         return records, msg
