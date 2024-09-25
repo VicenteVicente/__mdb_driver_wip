@@ -156,12 +156,6 @@ class MessageDecoder:
         size = self._iobuffer.read_uint32()
         res = {}
         for _ in range(size):
-            key_type = self._iobuffer.read_uint8()
-            if key_type != protocol.DataType.STRING.value:
-                raise MillenniumDBError(
-                    "MessageDecoder Error: Map keys must be a string"
-                )
-            key = self._decode_string()
-            value = self.decode()
-            res[key] = value
+            key = self.decode()
+            res[key] = self.decode()
         return res
