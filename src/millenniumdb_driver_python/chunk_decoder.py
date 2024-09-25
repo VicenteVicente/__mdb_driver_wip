@@ -2,9 +2,8 @@ from .iobuffer import IOBuffer
 from .millenniumdb_error import MillenniumDBError
 from .socket_connection import SocketConnection
 
+
 # Decode the incoming chunks from the server
-
-
 class ChunkDecoder:
     SEAL = 0x00_00
 

@@ -4,6 +4,7 @@ from .message_decoder import MessageDecoder
 from .socket_connection import SocketConnection
 
 
+# Represents the receiver of the incoming messages
 class MessageReceiver:
     SEAL = 0x00_00
 
@@ -14,6 +15,7 @@ class MessageReceiver:
         self._message_decoder = MessageDecoder(self._iobuffer)
 
     def receive(self) -> object:
+        # Reset the IOBuffer before receiving a new message
         self._iobuffer.reset()
 
         # Decode chunks

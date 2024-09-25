@@ -11,6 +11,7 @@ from .response_handler import ResponseHandler
 from .socket_connection import SocketConnection
 
 
+# This class represents the result of a query
 class Result:
     def __init__(
         self,

@@ -9,6 +9,7 @@ from .result import Result
 from .socket_connection import SocketConnection
 
 
+# Ensure that the session is open before executing a function
 def _ensure_session_open(func):
     @wraps(func)
     def wrapper(self, *args, **kwargs):
@@ -19,6 +20,7 @@ def _ensure_session_open(func):
     return wrapper
 
 
+# The class represents a session with the MillenniumDB server
 class Session:
 
     def __init__(self, host: str, port: int, driver: "Driver"):
@@ -29,6 +31,7 @@ class Session:
         self._response_handler = ResponseHandler()
 
     @_ensure_session_open
+    # Run a query on the server
     def run(self, query: str, timeout: float = 0.0) -> Result:
         return Result(
             self._driver,
@@ -40,10 +43,12 @@ class Session:
         )
 
     @_ensure_session_open
+    # Get the catalog of the MillenniumDB server
     def catalog(self):
         return Catalog(self._connection, self._message_receiver, self._response_handler)
 
     @_ensure_session_open
+    # Cancel a running query on the server
     def _cancel(self, result: Result) -> None:
         if result._query_preamble is None:
             raise MillenniumDBError("Session Error: query has not been executed yet")
@@ -55,6 +60,7 @@ class Session:
             )
         )
 
+    # Close the session
     def close(self):
         if self._open:
             self._open = False

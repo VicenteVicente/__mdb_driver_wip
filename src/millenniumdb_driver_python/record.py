@@ -3,6 +3,7 @@ from typing import Dict, List, Tuple
 from .millenniumdb_error import MillenniumDBError
 
 
+# This class represents an entry in the result of a query
 class Record:
     def __init__(
         self,
@@ -18,27 +19,40 @@ class Record:
         self._variables = variables
         self._values = values
         self._variableToIndex = variableToIndex
-        self.length = len(variables)
+        self.length = len(variables)  # The number of variables in the record
 
+    # Iterate over all entries (key, value)
+    # @returns an iterable over all entries
     def entries(self) -> List[Tuple[str, object]]:
         return [(self._variables[i], self._values[i]) for i in range(len(self))]
 
+    # Iterate over all values
+    # @returns an iterable over all values
     def values(self) -> List[object]:
         return self._values
 
+    # Iterate over all values. Equivalent to record.values()
+    # @returns an iterable over all values
     def __iter__(self):
         yield from self.values()
 
+    # Get the value associated with the key in the record
+    # @param key the variable name or its index emmited by the onVariables event
+    # @returns the value associated with the key
     def get(self, key):
         index = key if isinstance(key, int) else self._variableToIndex.get(key, -1)
         if index < 0 or index > len(self._values) - 1:
             raise MillenniumDBError(f"Record Error: Index {index} is out of bounds")
         return self._values[index]
 
+    # Check if the record has a value associated with the key
+    # @param key the variable name or its index emmited by the onVariables event
+    # @returns true if the record has a value associated with the key
     def has(self, key) -> bool:
         index = key if isinstance(key, int) else self._variableToIndex.get(key, -1)
         return index >= 0 and index < len(self._values)
 
+    # Return the record as an dictionary
     def to_dict(self):
         res = {}
         for i in range(len(self)):

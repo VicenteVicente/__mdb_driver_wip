@@ -22,11 +22,11 @@ def _ensure_driver_open(func):
 # queries and receiving results from the MillenniumDB server
 class Driver:
     def __init__(self, url: str):
-        parsed_url = urlparse(url)
-        self._open = True
-        self._host = parsed_url.hostname
-        self._port = parsed_url.port
-        self._sessions = []
+        parsed_url = urlparse(url)  # Parse the URL to get the hostname and port
+        self._open = True  # The state of the driver
+        self._host = parsed_url.hostname  # Set the hostname
+        self._port = parsed_url.port  # Set the port
+        self._sessions = []  # List of current sessions
 
     @_ensure_driver_open
     # Get the catalog of the MillenniumDB server
@@ -41,11 +41,13 @@ class Driver:
             session._cancel(result)
 
     @_ensure_driver_open
+    # Create a new session
     def session(self) -> Session:
         session = Session(self._host, self._port, self)
         self._sessions.append(session)
         return session
 
+    # Close the driver and all its sessions
     def close(self) -> None:
         if self._open:
             self._open = False

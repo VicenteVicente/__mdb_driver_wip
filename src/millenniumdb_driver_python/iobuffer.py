@@ -4,6 +4,7 @@ from typing import Union
 from .millenniumdb_error import MillenniumDBError
 
 
+# The class IOBuffer can be used to read and write data to and from a binary buffer
 class IOBuffer:
     def __init__(self, arg: Union[bytes, int]):
         if isinstance(arg, (bytes, bytearray)):
@@ -17,6 +18,8 @@ class IOBuffer:
 
         self._current_position = 0
 
+    # Update the position of the pointer
+    # num_bytes is the number of bytes to advance the pointer
     def _update_current_position(self, num_bytes: int) -> int:
         if self._current_position + num_bytes > len(self):
             raise MillenniumDBError(

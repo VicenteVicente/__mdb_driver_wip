@@ -6,6 +6,7 @@ from .response_handler import ResponseHandler
 from .socket_connection import SocketConnection
 
 
+# This class represents the catalog of the MillenniumDB server
 class Catalog:
     def __init__(
         self,
@@ -16,18 +17,21 @@ class Catalog:
         self._connection = connection  # The Socket connection
         self._message_receiver = message_receiver  # The Receiver of incoming messages
         self._response_handler = response_handler  # The Handler of the responses
-        self._model_id = None
-        self._version = None
-        self._catalog()
+        self._model_id = None  # The model ID of the server
+        self._version = None  # The version of the server
+        self._catalog()  # Get the model ID and version of the server
 
     @property
+    # Get the model ID of the server
     def model_id(self) -> int:
         return self._model_id
 
     @property
+    # Get the version of the server
     def version(self) -> int:
         return self._version
 
+    # Set the model ID and version of the server
     def _catalog(self):
         def on_success(summary) -> None:
             self._model_id = summary["modelId"]

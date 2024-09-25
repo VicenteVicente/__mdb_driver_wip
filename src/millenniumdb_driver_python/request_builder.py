@@ -2,12 +2,16 @@ from . import protocol
 from .iobuffer import IOBuffer
 
 
+# This class is for build requests
 class RequestBuilder:
     @staticmethod
     def encode_string(string: str) -> bytearray:
         return bytearray(string, "utf-8")
 
     @staticmethod
+    # Builds a request to execute a query
+    # @param query the query string to execute
+    # @returns the encoded request
     def run(query: str) -> IOBuffer:
         queryBytes = RequestBuilder.encode_string(query)
         queryBytesLength = len(queryBytes)
@@ -22,6 +26,7 @@ class RequestBuilder:
         return iobuffer
 
     @staticmethod
+    # Builds a request to get the catalog
     def catalog() -> IOBuffer:
         buffer = bytearray(5)
         iobuffer = IOBuffer(buffer)
@@ -31,6 +36,7 @@ class RequestBuilder:
         return iobuffer
 
     @staticmethod
+    # Builds a request to cancel a query
     def cancel(worker_index: int, cancellation_token: str) -> IOBuffer:
         cancellation_token_bytes = RequestBuilder.encode_string(cancellation_token)
         cancellation_token_bytes_length = len(cancellation_token_bytes)
