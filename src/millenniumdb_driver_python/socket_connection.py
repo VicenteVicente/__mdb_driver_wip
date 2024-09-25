@@ -21,8 +21,8 @@ class SocketConnection:
     def recvall_into(self, iobuffer: IOBuffer, num_bytes: int) -> None:
         end = iobuffer.used + num_bytes
 
-        if end > iobuffer.capacity():
-            iobuffer.extend(end - iobuffer.capacity())
+        if end > len(iobuffer):
+            iobuffer.extend(end - len(iobuffer))
 
         with memoryview(iobuffer.buffer) as view:
             while iobuffer.used < end:

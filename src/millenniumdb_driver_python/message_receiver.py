@@ -1,3 +1,6 @@
+from typing import Any, List, Tuple
+
+from . import protocol
 from .chunk_decoder import ChunkDecoder
 from .iobuffer import IOBuffer
 from .message_decoder import MessageDecoder
@@ -17,9 +20,19 @@ class MessageReceiver:
         self._chunk_decoder.decode()
 
         # Decode message
-        res = self._message_decoder.decode()
+        msg = self._message_decoder.decode()
 
         # Reset receiver buffer for the next message
         self._receiver_buffer.reset()
 
-        return res
+        return msg
+
+    def receive_records(self) -> Tuple[List[object], Any]:
+        records = []
+
+        msg = self.receive()
+        while msg["type"] == protocol.ResponseType.RECORD.value:
+            records.append(msg)
+            msg = self.receive()
+
+        return records, msg

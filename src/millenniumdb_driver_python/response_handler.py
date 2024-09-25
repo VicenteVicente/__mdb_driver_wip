@@ -10,28 +10,6 @@ class ResponseHandler:
         self._pending_observers: List[Dict[str, Callable]] = []
 
     def handle(self, message: Dict[str, object]) -> None:
-        if not isinstance(message, dict):
-            raise MillenniumDBError(
-                "ResponseHandler Error: Response was expected to be an object, but got"
-                f" {type(message)} instead."
-            )
-
-        if not "type" in message:
-            raise MillenniumDBError(
-                'ResponseHandler Error: Response object is missing "type" property'
-            )
-
-        if not isinstance(message["type"], int):
-            raise MillenniumDBError(
-                'ResponseHandler Error: "type" property is expected to be an integer,'
-                f' but got {type(message["type"])} instead.'
-            )
-
-        if not "payload" in message:
-            raise MillenniumDBError(
-                'ResponseHandler Error: Response object is missing "payload" property'
-            )
-
         match message["type"]:
             case protocol.ResponseType.SUCCESS.value:
                 self._callback("on_success", message["payload"])
@@ -41,9 +19,6 @@ class ResponseHandler:
                 self._callback("on_error", MillenniumDBError(message["payload"]))
                 self._next_observer()
 
-            case protocol.ResponseType.RECORD.value:
-                self._callback("on_record", message["payload"])
-
             case protocol.ResponseType.VARIABLES.value:
                 variables = message["payload"]["variables"]
                 query_preamble = message["payload"]["queryPreamble"]
@@ -51,10 +26,7 @@ class ResponseHandler:
                 self._next_observer()
 
             case _:
-                raise MillenniumDBError(
-                    "ResponseHandler Error: Unknown ResponseType with code:"
-                    f" 0x{message['type']:02x}"
-                )
+                raise NotImplementedError
 
     def add_observer(self, observer: Dict[str, Callable]) -> None:
         if self._current_observer is None:

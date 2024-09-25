@@ -19,7 +19,7 @@ class IOBuffer:
         self.used = 0
         self._current_read_position = 0
 
-    def capacity(self):
+    def __len__(self):
         return len(self.buffer)
 
     def read_uint8(self) -> int:
