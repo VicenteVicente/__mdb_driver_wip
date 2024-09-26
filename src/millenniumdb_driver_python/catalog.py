@@ -46,7 +46,7 @@ class Catalog:
         self._response_handler.handle(message)
 
     def _model_id_to_str(self, model_id: int) -> str:
-        match protocol.ModelId(model_id):
+        match model_id:
             case protocol.ModelId.QUAD_MODEL_ID:
                 return "quad"
 

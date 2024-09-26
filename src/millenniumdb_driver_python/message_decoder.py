@@ -24,7 +24,7 @@ class MessageDecoder:
         self._iobuffer = iobuffer
 
     def decode(self) -> object:
-        type_ = protocol.DataType(self._iobuffer.read_uint8())
+        type_ = self._iobuffer.read_uint8()
 
         match type_:
 
@@ -129,10 +129,7 @@ class MessageDecoder:
                 from_ = self.decode()
                 start = from_
                 for _ in range(path_length):
-                    reverse = (
-                        protocol.DataType(self._iobuffer.read_uint8())
-                        == protocol.DataType.BOOL_TRUE
-                    )
+                    reverse = self._iobuffer.read_uint8() == protocol.DataType.BOOL_TRUE
                     type_ = self.decode()
                     to = self.decode()
                     path_segments.append(GraphPathSegment(from_, to, type_, reverse))
@@ -141,9 +138,7 @@ class MessageDecoder:
                 return GraphPath(start, end, path_segments)
 
             case _:
-                raise MillenniumDBError(
-                    f"MessageDecoder Error: Unhandled DataType with code: 0x{type_:02x}"
-                )
+                raise NotImplementedError
 
     def _decode_string(self) -> str:
         size = self._iobuffer.read_uint32()

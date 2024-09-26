@@ -10,7 +10,7 @@ class ResponseHandler:
         self._pending_observers: List[Dict[str, Callable]] = []
 
     def handle(self, message: Dict[str, object]) -> None:
-        match protocol.ResponseType(message["type"]):
+        match message["type"]:
             case protocol.ResponseType.SUCCESS:
                 self._callback("on_success", message["payload"])
                 self._next_observer()

@@ -16,24 +16,23 @@ class SocketConnection:
         self._handshake()
 
     def sendall(self, iobuffer: IOBuffer) -> None:
-        self._socket.sendall(iobuffer.buffer[: iobuffer.used])
+        self._socket.sendall(iobuffer.view[: iobuffer.num_used_bytes])
 
     def recvall_into(self, iobuffer: IOBuffer, num_bytes: int) -> None:
-        end = iobuffer.used + num_bytes
-
+        end = iobuffer.num_used_bytes + num_bytes
         if end > len(iobuffer):
             iobuffer.extend(end - len(iobuffer))
 
-        with memoryview(iobuffer.buffer) as view:
-            while iobuffer.used < end:
-                num_bytes_recv = self._socket.recv_into(
-                    view[iobuffer.used : end], end - iobuffer.used
-                )
+        while iobuffer.num_used_bytes < end:
+            num_bytes_recv = self._socket.recv_into(
+                iobuffer.view[iobuffer.num_used_bytes : end],
+                end - iobuffer.num_used_bytes,
+            )
 
-                if num_bytes_recv == 0:
-                    raise MillenniumDBError("SocketConnection Error: no data received")
+            if num_bytes_recv == 0:
+                raise MillenniumDBError("SocketConnection Error: no data received")
 
-                iobuffer.used += num_bytes_recv
+            iobuffer.num_used_bytes += num_bytes_recv
 
     def close(self) -> None:
         try:

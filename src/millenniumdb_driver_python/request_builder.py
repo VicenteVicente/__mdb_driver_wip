@@ -13,8 +13,8 @@ class RequestBuilder:
         query_bytes_length = len(query_bytes)
         iobuffer = IOBuffer(10 + query_bytes_length)
         iobuffer.write_uint32(len(iobuffer) - 4)
-        iobuffer.write_uint8(protocol.RequestType.QUERY.value)
-        iobuffer.write_uint8(protocol.DataType.STRING.value)
+        iobuffer.write_uint8(protocol.RequestType.QUERY)
+        iobuffer.write_uint8(protocol.DataType.STRING)
         iobuffer.write_uint32(query_bytes_length)
         iobuffer.write_bytes(query_bytes)
         return iobuffer
@@ -23,7 +23,7 @@ class RequestBuilder:
     def catalog() -> IOBuffer:
         iobuffer = IOBuffer(5)
         iobuffer.write_uint32(len(iobuffer) - 4)
-        iobuffer.write_uint8(protocol.RequestType.CATALOG.value)
+        iobuffer.write_uint8(protocol.RequestType.CATALOG)
         return iobuffer
 
     @staticmethod
@@ -32,10 +32,10 @@ class RequestBuilder:
         cancellation_token_bytes_length = len(cancellation_token_bytes)
         iobuffer = IOBuffer(15 + cancellation_token_bytes_length)
         iobuffer.write_uint32(len(iobuffer) - 4)
-        iobuffer.write_uint8(protocol.RequestType.CANCEL.value)
-        iobuffer.write_uint8(protocol.DataType.UINT32.value)
+        iobuffer.write_uint8(protocol.RequestType.CANCEL)
+        iobuffer.write_uint8(protocol.DataType.UINT32)
         iobuffer.write_uint32(worker_index)
-        iobuffer.write_uint8(protocol.DataType.STRING.value)
+        iobuffer.write_uint8(protocol.DataType.STRING)
         iobuffer.write_uint32(cancellation_token_bytes_length)
         iobuffer.write_bytes(cancellation_token_bytes)
         return iobuffer

@@ -6,22 +6,26 @@ class IOBuffer:
     DEFAULT_INITIAL_BUFFER_SIZE = 4096
 
     def __init__(self, initial_buffer_size: int = DEFAULT_INITIAL_BUFFER_SIZE):
-        self.buffer = bytearray(initial_buffer_size)
-        self.used = 0
+        # Data itself. Should not be manipulated appart from extend method
+        self._buffer = bytearray(initial_buffer_size)
         self._current_read_position = 0
+        # Data view, this is what will be sliced, written and read
+        self.view = memoryview(self._buffer)
+        self.num_used_bytes = 0
 
     def extend(self, num_bytes: int) -> None:
-        self.buffer += bytearray(num_bytes)
+        self._buffer += bytearray(num_bytes)
+        self.view = memoryview(self._buffer)
 
     def reset(self) -> None:
-        self.used = 0
+        self.num_used_bytes = 0
         self._current_read_position = 0
 
     def __len__(self):
-        return len(self.buffer)
+        return len(self._buffer)
 
     def read_uint8(self) -> int:
-        return self.buffer[self._update_current_read_position(1)]
+        return self.view[self._update_current_read_position(1)]
 
     def read_uint32(self) -> int:
         return int.from_bytes(self.read_bytes(4), "big", signed=False)
@@ -39,28 +43,30 @@ class IOBuffer:
         return struct.unpack(">d", self.read_bytes(8))[0]
 
     def read_string(self, num_bytes: int) -> str:
-        return self.read_bytes(num_bytes).decode("utf-8")
+        return str(self.read_bytes(num_bytes), "utf-8")
 
-    def read_bytes(self, num_bytes: int) -> bytearray:
-        return self.buffer[
+    def read_bytes(self, num_bytes: int) -> memoryview:
+        return self.view[
             self._update_current_read_position(num_bytes) : self._current_read_position
         ]
 
     def write_uint8(self, value: int) -> None:
-        self.buffer[self._update_used(1)] = value
+        self.view[self._update_num_used_bytes(1)] = value
 
     def write_uint32(self, value: int) -> None:
-        self.buffer[self._update_used(4) : self._current_read_position] = (
+        self.view[self._update_num_used_bytes(4) : self.num_used_bytes] = (
             value.to_bytes(4, "big", signed=False)
         )
 
     def write_bytes(self, value: bytes) -> None:
-        self.buffer[self._update_used(len(value)) : self._current_read_position] = value
+        self.view[self._update_num_used_bytes(len(value)) : self.num_used_bytes] = value
 
     # Pop an uint16 from the end of the used buffer, removing its used bytes
     def pop_uint16(self) -> int:
-        res = self.buffer[self.used - 2] << 8 | self.buffer[self.used - 1]
-        self.used -= 2
+        res = (
+            self.view[self.num_used_bytes - 2] << 8 | self.view[self.num_used_bytes - 1]
+        )
+        self.num_used_bytes -= 2
         return res
 
     def _update_current_read_position(self, num_bytes: int) -> int:
@@ -68,7 +74,7 @@ class IOBuffer:
         self._current_read_position += num_bytes
         return previous_read_position
 
-    def _update_used(self, num_bytes: int) -> None:
-        previous_used = self.used
-        self.used += num_bytes
-        return previous_used
+    def _update_num_used_bytes(self, num_bytes: int) -> None:
+        previous_used_bytes = self.num_used_bytes
+        self.num_used_bytes += num_bytes
+        return previous_used_bytes
