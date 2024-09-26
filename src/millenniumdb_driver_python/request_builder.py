@@ -1,5 +1,3 @@
-import codecs
-
 from . import protocol
 from .iobuffer import IOBuffer
 
@@ -7,7 +5,7 @@ from .iobuffer import IOBuffer
 class RequestBuilder:
     @staticmethod
     def encode_string(string: str) -> bytes:
-        return codecs.encode(string, "utf-8")
+        return string.encode("utf-8")
 
     @staticmethod
     def run(query: str) -> IOBuffer:

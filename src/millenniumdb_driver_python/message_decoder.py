@@ -24,91 +24,91 @@ class MessageDecoder:
         self._iobuffer = iobuffer
 
     def decode(self) -> object:
-        type_ = self._iobuffer.read_uint8()
+        type_ = protocol.DataType(self._iobuffer.read_uint8())
 
         match type_:
 
-            case protocol.DataType.NULL.value:
+            case protocol.DataType.NULL:
                 return None
 
-            case protocol.DataType.BOOL_FALSE.value:
+            case protocol.DataType.BOOL_FALSE:
                 return False
 
-            case protocol.DataType.BOOL_TRUE.value:
+            case protocol.DataType.BOOL_TRUE:
                 return True
 
-            case protocol.DataType.UINT8.value:
+            case protocol.DataType.UINT8:
                 return self._iobuffer.read_uint8()
 
-            case protocol.DataType.UINT32.value:
+            case protocol.DataType.UINT32:
                 return self._iobuffer.read_uint32()
 
-            case protocol.DataType.UINT64.value:
+            case protocol.DataType.UINT64:
                 return self._iobuffer.read_uint64()
 
-            case protocol.DataType.INT64.value:
+            case protocol.DataType.INT64:
                 return self._iobuffer.read_int64()
 
-            case protocol.DataType.FLOAT.value:
+            case protocol.DataType.FLOAT:
                 return self._iobuffer.read_float()
 
-            case protocol.DataType.DOUBLE.value:
+            case protocol.DataType.DOUBLE:
                 return self._iobuffer.read_double()
 
-            case protocol.DataType.DECIMAL.value:
+            case protocol.DataType.DECIMAL:
                 decimal_string = self._decode_string()
                 return Decimal(decimal_string)
 
-            case protocol.DataType.STRING.value:
+            case protocol.DataType.STRING:
                 return self._decode_string()
 
-            case protocol.DataType.STRING_LANG.value:
+            case protocol.DataType.STRING_LANG:
                 str_ = self._decode_string()
                 lang = self._decode_string()
                 return StringLang(str_, lang)
 
-            case protocol.DataType.STRING_DATATYPE.value:
+            case protocol.DataType.STRING_DATATYPE:
                 str_ = self._decode_string()
                 datatype = self._decode_string()
                 return StringDatatype(str_, datatype)
 
-            case protocol.DataType.IRI.value:
+            case protocol.DataType.IRI:
                 iri = self._decode_string()
                 return IRI(iri)
 
-            case protocol.DataType.LIST.value:
+            case protocol.DataType.LIST:
                 return self._decode_list()
 
-            case protocol.DataType.MAP.value:
+            case protocol.DataType.MAP:
                 return self._decode_map()
 
-            case protocol.DataType.NAMED_NODE.value:
+            case protocol.DataType.NAMED_NODE:
                 node_id = self._decode_string()
                 return GraphNode(node_id)
 
-            case protocol.DataType.EDGE.value:
+            case protocol.DataType.EDGE:
                 edge_id = self._decode_string()
                 return GraphEdge(edge_id)
 
-            case protocol.DataType.ANON.value:
+            case protocol.DataType.ANON:
                 anon_id = self._decode_string()
                 return GraphAnon(anon_id)
 
-            case protocol.DataType.DATE.value:
+            case protocol.DataType.DATE:
                 year = self._iobuffer.read_int64()
                 month = self._iobuffer.read_int64()
                 day = self._iobuffer.read_int64()
                 tz_minute_offset = self._iobuffer.read_int64()
                 return SimpleDate(year, month, day, tz_minute_offset)
 
-            case protocol.DataType.TIME.value:
+            case protocol.DataType.TIME:
                 hour = self._iobuffer.read_int64()
                 minute = self._iobuffer.read_int64()
                 second = self._iobuffer.read_int64()
                 tz_minute_offset = self._iobuffer.read_int64()
                 return Time(hour, minute, second, tz_minute_offset)
 
-            case protocol.DataType.DATETIME.value:
+            case protocol.DataType.DATETIME:
                 year = self._iobuffer.read_int64()
                 month = self._iobuffer.read_int64()
                 day = self._iobuffer.read_int64()
@@ -120,7 +120,7 @@ class MessageDecoder:
                     year, month, day, hour, minute, second, tz_minute_offset
                 )
 
-            case protocol.DataType.PATH.value:
+            case protocol.DataType.PATH:
                 path_length = self._iobuffer.read_uint32()
                 if path_length == 0:
                     node = self.decode()
@@ -130,7 +130,8 @@ class MessageDecoder:
                 start = from_
                 for _ in range(path_length):
                     reverse = (
-                        self._iobuffer.read_uint8() == protocol.DataType.BOOL_TRUE.value
+                        protocol.DataType(self._iobuffer.read_uint8())
+                        == protocol.DataType.BOOL_TRUE
                     )
                     type_ = self.decode()
                     to = self.decode()

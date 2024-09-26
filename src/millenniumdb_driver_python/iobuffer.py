@@ -1,6 +1,4 @@
-import codecs
 import struct
-from typing import Union
 
 
 # Read/write buffer for internal usage. No errors raised because we assume correct usage
@@ -26,13 +24,13 @@ class IOBuffer:
         return self.buffer[self._update_current_read_position(1)]
 
     def read_uint32(self) -> int:
-        return struct.unpack(">I", self.read_bytes(4))[0]
+        return int.from_bytes(self.read_bytes(4), "big", signed=False)
 
     def read_uint64(self) -> int:
-        return struct.unpack(">Q", self.read_bytes(8))[0]
+        return int.from_bytes(self.read_bytes(8), "big", signed=False)
 
     def read_int64(self) -> int:
-        return struct.unpack(">q", self.read_bytes(8))[0]
+        return int.from_bytes(self.read_bytes(8), "big", signed=True)
 
     def read_float(self) -> float:
         return struct.unpack(">f", self.read_bytes(4))[0]
@@ -41,22 +39,19 @@ class IOBuffer:
         return struct.unpack(">d", self.read_bytes(8))[0]
 
     def read_string(self, num_bytes: int) -> str:
-        return codecs.decode(self.read_bytes(num_bytes), "utf-8")
+        return self.read_bytes(num_bytes).decode("utf-8")
 
-    def read_bytes(self, num_bytes: int) -> memoryview:
-        with memoryview(self.buffer) as view:
-            return view[
-                self._update_current_read_position(
-                    num_bytes
-                ) : self._current_read_position
-            ]
+    def read_bytes(self, num_bytes: int) -> bytearray:
+        return self.buffer[
+            self._update_current_read_position(num_bytes) : self._current_read_position
+        ]
 
     def write_uint8(self, value: int) -> None:
         self.buffer[self._update_used(1)] = value
 
     def write_uint32(self, value: int) -> None:
-        self.buffer[self._update_used(4) : self._current_read_position] = struct.pack(
-            ">I", value
+        self.buffer[self._update_used(4) : self._current_read_position] = (
+            value.to_bytes(4, "big", signed=False)
         )
 
     def write_bytes(self, value: bytes) -> None:

@@ -10,16 +10,16 @@ class ResponseHandler:
         self._pending_observers: List[Dict[str, Callable]] = []
 
     def handle(self, message: Dict[str, object]) -> None:
-        match message["type"]:
-            case protocol.ResponseType.SUCCESS.value:
+        match protocol.ResponseType(message["type"]):
+            case protocol.ResponseType.SUCCESS:
                 self._callback("on_success", message["payload"])
                 self._next_observer()
 
-            case protocol.ResponseType.ERROR.value:
+            case protocol.ResponseType.ERROR:
                 self._callback("on_error", MillenniumDBError(message["payload"]))
                 self._next_observer()
 
-            case protocol.ResponseType.VARIABLES.value:
+            case protocol.ResponseType.VARIABLES:
                 variables = message["payload"]["variables"]
                 query_preamble = message["payload"]["queryPreamble"]
                 self._callback("on_variables", variables, query_preamble)
