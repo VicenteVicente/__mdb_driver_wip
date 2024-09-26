@@ -1,8 +1,6 @@
 from threading import Thread
-from time import perf_counter_ns, sleep
+from time import sleep
 from typing import Dict, Iterator, List, Tuple
-
-import pandas as pd
 
 from .message_receiver import MessageReceiver
 from .record import Record
@@ -45,8 +43,10 @@ class Result:
     def data(self) -> List[Dict[str, object]]:
         return [record.to_dict() for record in self._records]
 
-    def to_df(self) -> pd.DataFrame:
-        return pd.DataFrame(self.data())
+    def to_df(self) -> "DataFrame":
+        from pandas import DataFrame
+
+        return DataFrame(self.data())
 
     def summary(self) -> object:
         return self._summary
