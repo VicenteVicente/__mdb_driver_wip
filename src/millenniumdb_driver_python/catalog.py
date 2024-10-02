@@ -52,10 +52,10 @@ class Catalog:
 
     def _model_id_to_str(self, model_id: int) -> str:
         match model_id:
-            case protocol.ModelId.QUAD_MODEL_ID.value:
+            case protocol.ModelId.QUAD_MODEL_ID:
                 return "quad"
 
-            case protocol.ModelId.RDF_MODEL_ID.value:
+            case protocol.ModelId.RDF_MODEL_ID:
                 return "rdf"
 
             case _:

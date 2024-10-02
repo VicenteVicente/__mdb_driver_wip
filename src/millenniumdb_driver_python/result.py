@@ -2,8 +2,6 @@ from threading import Thread
 from time import sleep
 from typing import Dict, Iterator, List, Tuple
 
-import pandas as pd
-
 from .message_receiver import MessageReceiver
 from .record import Record
 from .request_builder import RequestBuilder
@@ -46,8 +44,10 @@ class Result:
     def data(self) -> List[Dict[str, object]]:
         return [record.to_dict() for record in self._records]
 
-    def to_df(self) -> pd.DataFrame:
-        return pd.DataFrame(self.data())
+    def to_df(self) -> "DataFrame":
+        from pandas import DataFrame
+
+        return DataFrame(self.data())
 
     def summary(self) -> object:
         return self._summary
@@ -70,11 +70,6 @@ class Result:
                 t = Thread(target=self._try_cancel, args=[timeout], daemon=True)
                 t.start()
 
-        def on_record(record) -> None:
-            self._records.append(
-                Record(self._variables, record, self._variable_to_index)
-            )
-
         def on_success(summary) -> None:
             self._summary = summary
             self._streaming = False
@@ -87,7 +82,7 @@ class Result:
             {"on_variables": on_variables, "on_error": on_error}
         )
         self._response_handler.add_observer(
-            {"on_record": on_record, "on_success": on_success, "on_error": on_error}
+            {"on_success": on_success, "on_error": on_error}
         )
         self._connection.sendall(RequestBuilder.run(query))
 
@@ -96,6 +91,9 @@ class Result:
         self._response_handler.handle(message)
 
         # on_record / on_success
-        while self._streaming:
-            message = self._message_receiver.receive()
-            self._response_handler.handle(message)
+        raw_records, termination_message = self._message_receiver.receive_records()
+        self._records = [
+            Record(self._variables, raw_record, self._variable_to_index)
+            for raw_record in raw_records
+        ]
+        self._response_handler.handle(termination_message)

@@ -5,34 +5,30 @@ from .iobuffer import IOBuffer
 # This class is for build requests
 class RequestBuilder:
     @staticmethod
-    def encode_string(string: str) -> bytearray:
-        return bytearray(string, "utf-8")
+    def encode_string(string: str) -> bytes:
+        return string.encode("utf-8")
 
     @staticmethod
     # Builds a request to execute a query
     # @param query the query string to execute
     # @returns the encoded request
     def run(query: str) -> IOBuffer:
-        queryBytes = RequestBuilder.encode_string(query)
-        queryBytesLength = len(queryBytes)
-        buffer = bytearray(10 + queryBytesLength)
-        iobuffer = IOBuffer(buffer)
+        query_bytes = RequestBuilder.encode_string(query)
+        query_bytes_length = len(query_bytes)
+        iobuffer = IOBuffer(10 + query_bytes_length)
         iobuffer.write_uint32(len(iobuffer) - 4)
-        iobuffer.write_uint8(protocol.RequestType.QUERY.value)
-        iobuffer.write_uint8(protocol.DataType.STRING.value)
-        iobuffer.write_uint32(queryBytesLength)
-        iobuffer.write_bytes(queryBytes)
-        iobuffer.reset()
+        iobuffer.write_uint8(protocol.RequestType.QUERY)
+        iobuffer.write_uint8(protocol.DataType.STRING)
+        iobuffer.write_uint32(query_bytes_length)
+        iobuffer.write_bytes(query_bytes)
         return iobuffer
 
     @staticmethod
     # Builds a request to get the catalog
     def catalog() -> IOBuffer:
-        buffer = bytearray(5)
-        iobuffer = IOBuffer(buffer)
+        iobuffer = IOBuffer(5)
         iobuffer.write_uint32(len(iobuffer) - 4)
-        iobuffer.write_uint8(protocol.RequestType.CATALOG.value)
-        iobuffer.reset()
+        iobuffer.write_uint8(protocol.RequestType.CATALOG)
         return iobuffer
 
     @staticmethod
@@ -40,14 +36,12 @@ class RequestBuilder:
     def cancel(worker_index: int, cancellation_token: str) -> IOBuffer:
         cancellation_token_bytes = RequestBuilder.encode_string(cancellation_token)
         cancellation_token_bytes_length = len(cancellation_token_bytes)
-        buffer = bytearray(15 + cancellation_token_bytes_length)
-        iobuffer = IOBuffer(buffer)
+        iobuffer = IOBuffer(15 + cancellation_token_bytes_length)
         iobuffer.write_uint32(len(iobuffer) - 4)
-        iobuffer.write_uint8(protocol.RequestType.CANCEL.value)
-        iobuffer.write_uint8(protocol.DataType.UINT32.value)
+        iobuffer.write_uint8(protocol.RequestType.CANCEL)
+        iobuffer.write_uint8(protocol.DataType.UINT32)
         iobuffer.write_uint32(worker_index)
-        iobuffer.write_uint8(protocol.DataType.STRING.value)
+        iobuffer.write_uint8(protocol.DataType.STRING)
         iobuffer.write_uint32(cancellation_token_bytes_length)
         iobuffer.write_bytes(cancellation_token_bytes)
-        iobuffer.reset()
         return iobuffer

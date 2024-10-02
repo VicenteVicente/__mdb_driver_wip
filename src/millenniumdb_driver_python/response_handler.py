@@ -12,51 +12,23 @@ class ResponseHandler:
 
     # Handle an incoming response
     def handle(self, message: Dict[str, object]) -> None:
-        if not isinstance(message, dict):
-            raise MillenniumDBError(
-                "ResponseHandler Error: Response was expected to be an object, but got"
-                f" {type(message)} instead."
-            )
-
-        if not "type" in message:
-            raise MillenniumDBError(
-                'ResponseHandler Error: Response object is missing "type" property'
-            )
-
-        if not isinstance(message["type"], int):
-            raise MillenniumDBError(
-                'ResponseHandler Error: "type" property is expected to be an integer,'
-                f' but got {type(message["type"])} instead.'
-            )
-
-        if not "payload" in message:
-            raise MillenniumDBError(
-                'ResponseHandler Error: Response object is missing "payload" property'
-            )
-
         match message["type"]:
-            case protocol.ResponseType.SUCCESS.value:
+            case protocol.ResponseType.SUCCESS:
                 self._callback("on_success", message["payload"])
                 self._next_observer()
 
-            case protocol.ResponseType.ERROR.value:
+            case protocol.ResponseType.ERROR:
                 self._callback("on_error", MillenniumDBError(message["payload"]))
                 self._next_observer()
 
-            case protocol.ResponseType.RECORD.value:
-                self._callback("on_record", message["payload"])
-
-            case protocol.ResponseType.VARIABLES.value:
+            case protocol.ResponseType.VARIABLES:
                 variables = message["payload"]["variables"]
                 query_preamble = message["payload"]["queryPreamble"]
                 self._callback("on_variables", variables, query_preamble)
                 self._next_observer()
 
             case _:
-                raise MillenniumDBError(
-                    "ResponseHandler Error: Unknown ResponseType with code:"
-                    f" 0x{message['type']:02x}"
-                )
+                raise NotImplementedError
 
     # Enqueue a new observer for handling a response
     # @param observer that will handle the received data

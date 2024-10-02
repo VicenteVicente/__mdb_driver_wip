@@ -1,19 +1,19 @@
-from enum import Enum, auto
+from enum import IntEnum, auto
 
 DRIVER_PREAMBLE_BYTES = b"MDB_DRVR"
 SERVER_PREAMBLE_BYTES = b"MDB_SRVR"
 
-DEFAULT_SOCKET_TIMEOUT = 10.0
+DEFAULT_CONNECTION_TIMEOUT = 20.0
 
 
-class ModelId(Enum):
+class ModelId(IntEnum):
     QUAD_MODEL_ID = 0
     RDF_MODEL_ID = auto()
 
     TOTAL = auto()
 
 
-class DataType(Enum):
+class DataType(IntEnum):
     NULL = 0
     BOOL_FALSE = auto()
     BOOL_TRUE = auto()
@@ -42,7 +42,7 @@ class DataType(Enum):
     TOTAL = auto()
 
 
-class RequestType(Enum):
+class RequestType(IntEnum):
     QUERY = 0
     CATALOG = auto()
     CANCEL = auto()
@@ -52,7 +52,7 @@ class RequestType(Enum):
     TOTAL = auto()
 
 
-class ResponseType(Enum):
+class ResponseType(IntEnum):
     SUCCESS = 0
     ERROR = auto()
     RECORD = auto()

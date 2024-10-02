@@ -1,110 +1,80 @@
 import struct
-from typing import Union
-
-from .millenniumdb_error import MillenniumDBError
 
 
 # The class IOBuffer can be used to read and write data to and from a binary buffer
 class IOBuffer:
-    def __init__(self, arg: Union[bytes, int]):
-        if isinstance(arg, (bytes, bytearray)):
-            self.buffer = arg
-        elif isinstance(arg, int):
-            self.buffer = bytearray(arg)
-        else:
-            raise MillenniumDBError(
-                f"IOBuffer Error: Invalid argument with type {type(arg).__name__}"
-            )
+    DEFAULT_INITIAL_BUFFER_SIZE = 4096
 
-        self._current_position = 0
+    def __init__(self, initial_buffer_size: int = DEFAULT_INITIAL_BUFFER_SIZE):
+        # Data itself. Should not be manipulated appart from extend method
+        self._buffer = bytearray(initial_buffer_size)
+        self._current_read_position = 0
+        # Data view, this is what will be sliced, written and read
+        self.view = memoryview(self._buffer)
+        self.num_used_bytes = 0
 
-    # Update the position of the pointer
-    # num_bytes is the number of bytes to advance the pointer
-    def _update_current_position(self, num_bytes: int) -> int:
-        if self._current_position + num_bytes > len(self):
-            raise MillenniumDBError(
-                "IOBuffer Error: Attempted to perform an operation past the end of the"
-                " buffer"
-            )
+    def extend(self, num_bytes: int) -> None:
+        self._buffer += bytearray(num_bytes)
+        self.view = memoryview(self._buffer)
 
-        previous_position = self._current_position
-        self._current_position += num_bytes
-        return previous_position
+    def reset(self) -> None:
+        self.num_used_bytes = 0
+        self._current_read_position = 0
+
+    def __len__(self):
+        return len(self._buffer)
 
     def read_uint8(self) -> int:
-        return self.buffer[self._update_current_position(1)]
-
-    def read_uint16(self) -> int:
-        return int.from_bytes(
-            self.buffer[self._update_current_position(2) : self._current_position],
-            "big",
-        )
+        return self.view[self._update_current_read_position(1)]
 
     def read_uint32(self) -> int:
-        return int.from_bytes(
-            self.buffer[self._update_current_position(4) : self._current_position],
-            "big",
-        )
+        return int.from_bytes(self.read_bytes(4), "big", signed=False)
 
     def read_uint64(self) -> int:
-        return int.from_bytes(
-            self.buffer[self._update_current_position(8) : self._current_position],
-            "big",
-        )
+        return int.from_bytes(self.read_bytes(8), "big", signed=False)
 
     def read_int64(self) -> int:
-        return int.from_bytes(
-            self.buffer[self._update_current_position(8) : self._current_position],
-            "big",
-            signed=True,
-        )
+        return int.from_bytes(self.read_bytes(8), "big", signed=True)
 
     def read_float(self) -> float:
-        return struct.unpack(
-            ">f", self.buffer[self._update_current_position(4) : self._current_position]
-        )[0]
+        return struct.unpack(">f", self.read_bytes(4))[0]
 
     def read_double(self) -> float:
-        return struct.unpack(
-            ">d", self.buffer[self._update_current_position(8) : self._current_position]
-        )[0]
+        return struct.unpack(">d", self.read_bytes(8))[0]
 
     def read_string(self, num_bytes: int) -> str:
-        with memoryview(self.buffer) as view:
-            return str(
-                view[self._update_current_position(num_bytes) : self._current_position],
-                "utf-8",
-            )
+        return str(self.read_bytes(num_bytes), "utf-8")
+
+    def read_bytes(self, num_bytes: int) -> memoryview:
+        return self.view[
+            self._update_current_read_position(num_bytes) : self._current_read_position
+        ]
 
     def write_uint8(self, value: int) -> None:
-        self.buffer[self._update_current_position(1)] = value
-
-    def write_uint16(self, value: int) -> None:
-        self.buffer[self._update_current_position(2) : self._current_position] = (
-            value.to_bytes(2, "big")
-        )
+        self.view[self._update_num_used_bytes(1)] = value
 
     def write_uint32(self, value: int) -> None:
-        self.buffer[self._update_current_position(4) : self._current_position] = (
-            value.to_bytes(4, "big")
+        self.view[self._update_num_used_bytes(4) : self.num_used_bytes] = (
+            value.to_bytes(4, "big", signed=False)
         )
 
     def write_bytes(self, value: bytes) -> None:
-        self.buffer[
-            self._update_current_position(len(value)) : self._current_position
-        ] = value
+        self.view[self._update_num_used_bytes(len(value)) : self.num_used_bytes] = value
 
-    def used(self) -> int:
-        return self._current_position
+    # Pop an uint16 from the end of the used buffer, removing its used bytes
+    def pop_uint16(self) -> int:
+        res = (
+            self.view[self.num_used_bytes - 2] << 8 | self.view[self.num_used_bytes - 1]
+        )
+        self.num_used_bytes -= 2
+        return res
 
-    def remaining(self) -> int:
-        return len(self) - self._current_position
+    def _update_current_read_position(self, num_bytes: int) -> int:
+        previous_read_position = self._current_read_position
+        self._current_read_position += num_bytes
+        return previous_read_position
 
-    def has_remaining(self) -> bool:
-        return self.remaining() > 0
-
-    def reset(self) -> None:
-        self._current_position = 0
-
-    def __len__(self):
-        return len(self.buffer)
+    def _update_num_used_bytes(self, num_bytes: int) -> None:
+        previous_used_bytes = self.num_used_bytes
+        self.num_used_bytes += num_bytes
+        return previous_used_bytes
