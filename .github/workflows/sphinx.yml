@@ -10,9 +10,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: installsphynx
         run: python -m pip install sphinx
-      - name: cd docs
-        run: cd docs/
       - name: generate sphinx
         run: sphinx-build -M html . _build/
+        working-directory: docs/
       - name: check
         run: du .
