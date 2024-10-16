@@ -1,10 +1,17 @@
 from typing import List
 
 
-# Represents a node in the graph
 class GraphNode:
+    """
+    Represents a node in the graph
+    """
+
     def __init__(self, id: str):
-        self.id = id  # The node identifier
+        """
+        attributes:
+        id (str): The node identifier
+        """
+        self.id = id
 
     def __str__(self):
         return self.id
@@ -13,10 +20,17 @@ class GraphNode:
         return f"GraphNode<{str(self)}>"
 
 
-# Represents an edge in the graph
 class GraphEdge:
+    """
+    Represents an edge in the graph
+    """
+
     def __init__(self, id: str):
-        self.id = id  # The edge identifier
+        """
+        attributes:
+        id (str): The edge identifier
+        """
+        self.id = id
 
     def __str__(self):
         return self.id
@@ -25,10 +39,17 @@ class GraphEdge:
         return f"GraphEdge<{str(self)}>"
 
 
-# Represents an anonymous node in the graph
 class GraphAnon:
+    """
+    Represents an anonymous node in the graph
+    """
+
     def __init__(self, id: str):
-        self.id = id  # The anonymous node identifier
+        """
+        attributes:
+        id (str): The anonymous node identifier
+        """
+        self.id = id
 
     def __str__(self):
         return self.id
@@ -130,12 +151,21 @@ class DateTime:
         return f"DateTime<{str(self)}>"
 
 
-# Represents a segment in the path
 class GraphPathSegment:
+    """
+    Represents a segment in the path
+    """
+
     def __init__(self, from_: object, to: object, type: object, reverse: bool) -> None:
-        self.from_ = from_  # The starting node of the segment
-        self.to = to  # The ending node of the segment
-        self.type = type  # The type of the segment
+        """
+        attributes:
+        from_ (object): The starting node of the segment
+        to (object): The ending node of the segment
+        type (object): The type of the segment
+        """
+        self.from_ = from_
+        self.to = to
+        self.type = type
 
         # Whether the segment is in reverse direction,
         # for example the segment should be printed
@@ -143,18 +173,28 @@ class GraphPathSegment:
         self.reverse = reverse
 
 
-# Represents a path in the graph
 class GraphPath:
+    """
+    Represents a path in the graph
+    """
+
     def __init__(
         self,
         start: object,
         end: object,
         segments: List[GraphPathSegment],
     ) -> None:
-        self.start = start  # The starting node of the path
-        self.end = end  # The ending node of the path
-        self.segments = segments  # The segments of the path
-        self.length = len(segments)  # The number of segments in the path
+        """
+        attributes:
+        start (object): The starting node of the path
+        end (object): The ending node of the path
+        segments (List[GraphPathSegment]): The segments of the path
+        length (int): The number of segments in the path
+        """
+        self.start = start
+        self.end = end
+        self.segments = segments
+        self.length = len(segments)
 
     def __repr__(self) -> str:
         return f"GraphPath<length={self.length}>"

@@ -3,8 +3,11 @@ from typing import Dict, List, Tuple
 from .millenniumdb_error import MillenniumDBError
 
 
-# This class represents an entry in the result of a query
 class Record:
+    """
+    This class represents an entry in the result of a query
+    """
+
     def __init__(
         self,
         variables: List[str],
@@ -21,39 +24,56 @@ class Record:
         self._variableToIndex = variableToIndex
         self.length = len(variables)  # The number of variables in the record
 
-    # Iterate over all entries (key, value)
-    # @returns an iterable over all entries
     def entries(self) -> List[Tuple[str, object]]:
+        """
+        Iterate over all entries (key, value)
+
+        :return: an iterable over all entries
+        """
         return [(self._variables[i], self._values[i]) for i in range(len(self))]
 
-    # Iterate over all values
-    # @returns an iterable over all values
     def values(self) -> List[object]:
+        """
+        Iterate over all values
+
+        :return: an iterable over all values
+        """
         return self._values
 
-    # Iterate over all values. Equivalent to record.values()
-    # @returns an iterable over all values
     def __iter__(self):
+        """
+        Iterate over all values. Equivalent to record.values()
+
+        :yield: an iterable over all values
+        """
         yield from self.values()
 
-    # Get the value associated with the key in the record
-    # @param key the variable name or its index emmited by the onVariables event
-    # @returns the value associated with the key
     def get(self, key):
+        """
+        Get the value associated with the key in the record
+
+        :param key: The variable name or its index emmited by the onVariables event
+        :return: The value associated with the key
+        """
         index = key if isinstance(key, int) else self._variableToIndex.get(key, -1)
         if index < 0 or index > len(self._values) - 1:
             raise MillenniumDBError(f"Record Error: Index {index} is out of bounds")
         return self._values[index]
 
-    # Check if the record has a value associated with the key
-    # @param key the variable name or its index emmited by the onVariables event
-    # @returns true if the record has a value associated with the key
     def has(self, key) -> bool:
+        """
+        Check if the record has a value associated with the key
+
+        :param key: The variable name or its index emmited by the onVariables event
+        :return: True if the record has a value associated with the key
+        """
         index = key if isinstance(key, int) else self._variableToIndex.get(key, -1)
         return index >= 0 and index < len(self._values)
 
-    # Return the record as an dictionary
     def to_dict(self):
+        """
+        Return the record as a dictionary
+        """
         res = {}
         for i in range(len(self)):
             res[self._variables[i]] = self._values[i]

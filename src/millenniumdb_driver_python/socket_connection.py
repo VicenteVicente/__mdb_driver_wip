@@ -5,8 +5,11 @@ from .iobuffer import IOBuffer
 from .millenniumdb_error import MillenniumDBError
 
 
-# Represents the socket connection to the server
 class SocketConnection:
+    """
+    Represents the socket connection to the server
+    """
+
     def __init__(
         self,
         host: str,
@@ -16,8 +19,10 @@ class SocketConnection:
         self._socket = self._create_socket(host, port)
         self._handshake()
 
-    # Send data to the server
     def sendall(self, iobuffer: IOBuffer) -> None:
+        """
+        Send the data to the server
+        """
         self._socket.sendall(iobuffer.view[: iobuffer.num_used_bytes])
 
     def recvall_into(self, iobuffer: IOBuffer, num_bytes: int) -> None:
@@ -36,8 +41,10 @@ class SocketConnection:
 
             iobuffer.num_used_bytes += num_bytes_recv
 
-    # Close the socket connection
     def close(self) -> None:
+        """
+        Close the socket connection
+        """
         try:
             self._socket.shutdown(socket.SHUT_RDWR)
         except OSError:
@@ -47,8 +54,10 @@ class SocketConnection:
         except OSError:
             pass
 
-    # Perform the handshake with the server
     def _handshake(self) -> None:
+        """
+        Perform the handshake with the server
+        """
         self._socket.sendall(protocol.DRIVER_PREAMBLE_BYTES)
         response = self._socket.recv(8)
         if response != protocol.SERVER_PREAMBLE_BYTES:

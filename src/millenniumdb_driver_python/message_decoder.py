@@ -19,13 +19,22 @@ from .iobuffer import IOBuffer
 from .millenniumdb_error import MillenniumDBError
 
 
-# Represents the decoder of the incoming messages
 class MessageDecoder:
-    def __init__(self, iobuffer: IOBuffer):
-        self._iobuffer = iobuffer  # The IOBuffer of the incoming data
+    """
+    Represents the decoder of the incoming messages
+    """
 
-    # Decode the incoming message
+    def __init__(self, iobuffer: IOBuffer):
+        """
+        attributes:
+        _iobuffer (IOBuffer): The IOBuffer of the incoming
+        """
+        self._iobuffer = iobuffer
+
     def decode(self) -> object:
+        """
+        Decode the incoming message
+        """
         type_ = self._iobuffer.read_uint8()
 
         match type_:

@@ -3,16 +3,27 @@ from .millenniumdb_error import MillenniumDBError
 from .socket_connection import SocketConnection
 
 
-# Decode the incoming chunks from the server
 class ChunkDecoder:
+    """
+    Decode the incoming chunks from the server
+
+    """
+
     SEAL = 0x00_00
 
     def __init__(self, connection: SocketConnection, iobuffer: IOBuffer):
-        self._connection = connection  # The Socket connection
-        self._iobuffer = iobuffer  # The IOBuffer of the incoming data
+        """
+        attributes:
+        _connection (SocketConnection): The Socket connection
+        _iobuffer (IOBuffer): The IOBuffer of the incoming data
+        """
+        self._connection = connection
+        self._iobuffer = iobuffer
 
-    # Initialize the decoding loop until the SEAL is received
     def decode(self):
+        """
+        Initialize the decoding loop until the SEAL is received
+        """
         try:
             # Get first chunk size
             self._connection.recvall_into(self._iobuffer, 2)

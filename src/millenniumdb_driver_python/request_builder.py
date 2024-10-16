@@ -4,15 +4,23 @@ from .iobuffer import IOBuffer
 
 # This class is for build requests
 class RequestBuilder:
+    """
+    This class is for build requests
+
+    """
+
     @staticmethod
     def encode_string(string: str) -> bytes:
         return string.encode("utf-8")
 
     @staticmethod
-    # Builds a request to execute a query
-    # @param query the query string to execute
-    # @returns the encoded request
     def run(query: str) -> IOBuffer:
+        """
+        Builds a request to execute a query
+
+        :param query: The query string to execute
+        :return: The encoded request
+        """
         query_bytes = RequestBuilder.encode_string(query)
         query_bytes_length = len(query_bytes)
         iobuffer = IOBuffer(10 + query_bytes_length)
@@ -24,16 +32,20 @@ class RequestBuilder:
         return iobuffer
 
     @staticmethod
-    # Builds a request to get the catalog
     def catalog() -> IOBuffer:
+        """
+        Builds a request to get the catalog
+        """
         iobuffer = IOBuffer(5)
         iobuffer.write_uint32(len(iobuffer) - 4)
         iobuffer.write_uint8(protocol.RequestType.CATALOG)
         return iobuffer
 
     @staticmethod
-    # Builds a request to cancel a query
     def cancel(worker_index: int, cancellation_token: str) -> IOBuffer:
+        """
+        Builds a request to cancel a query
+        """
         cancellation_token_bytes = RequestBuilder.encode_string(cancellation_token)
         cancellation_token_bytes_length = len(cancellation_token_bytes)
         iobuffer = IOBuffer(15 + cancellation_token_bytes_length)

@@ -1,8 +1,11 @@
 import struct
 
 
-# The class IOBuffer can be used to read and write data to and from a binary buffer
 class IOBuffer:
+    """
+    The class IOBuffer can be used to read and write data to and from a binary buffer
+    """
+
     DEFAULT_INITIAL_BUFFER_SIZE = 4096
 
     def __init__(self, initial_buffer_size: int = DEFAULT_INITIAL_BUFFER_SIZE):
