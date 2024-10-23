@@ -1,9 +1,8 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath("../.."))
 
-src_path = os.path.join("..", "src", "millenniumdb_driver_python")
+src_path = os.path.join("src", "millenniumdb_driver_python")
 
 index_content = """\
 .. include:: ../README.rst
@@ -73,5 +72,5 @@ for filename in os.listdir(src_path):
    :show-inheritance:
 """
 
-with open("index.rst", "w") as f:
+with open("docs/index.rst", "w") as f:
     f.write(index_content)
