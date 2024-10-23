@@ -4,13 +4,26 @@ from .socket_connection import SocketConnection
 
 
 class ChunkDecoder:
+    """
+    Decode the incoming chunks from the server
+
+    """
+
     SEAL = 0x00_00
 
     def __init__(self, connection: SocketConnection, iobuffer: IOBuffer):
+        """
+        attributes:
+        _connection (SocketConnection): The Socket connection
+        _iobuffer (IOBuffer): The IOBuffer of the incoming data
+        """
         self._connection = connection
         self._iobuffer = iobuffer
 
     def decode(self):
+        """
+        Initialize the decoding loop until the SEAL is received
+        """
         try:
             # Get first chunk size
             self._connection.recvall_into(self._iobuffer, 2)

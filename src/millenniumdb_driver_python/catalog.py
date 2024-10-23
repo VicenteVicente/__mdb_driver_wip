@@ -7,12 +7,27 @@ from .socket_connection import SocketConnection
 
 
 class Catalog:
+    """
+    This class represents the catalog of the MillenniumDB server
+    """
+
     def __init__(
         self,
         connection: SocketConnection,
         message_receiver: MessageReceiver,
         response_handler: ResponseHandler,
     ):
+        """Initialize the Catalog.
+
+        Args:
+            connection: The Socket connection
+            message_receiver: The Receiver of incoming messages
+            response_handler: The Handler of the responses
+
+        Attributes:
+            _model_id (str or None): The model ID of the server.
+            _version (str or None): The version of the server.
+        """
         self._connection = connection
         self._message_receiver = message_receiver
         self._response_handler = response_handler
@@ -22,13 +37,24 @@ class Catalog:
 
     @property
     def model_id(self) -> int:
+        """
+        Get the model ID of the server
+        """
         return self._model_id
 
     @property
     def version(self) -> int:
+        """
+        Get the version of the server
+        """
         return self._version
 
     def _catalog(self):
+        """
+        Set the model ID and version of the server
+        Add success and error observers to the response handler
+        """
+
         def on_success(summary) -> None:
             self._model_id = summary["modelId"]
             self._version = summary["version"]
@@ -41,7 +67,6 @@ class Catalog:
         )
         self._connection.sendall(RequestBuilder.catalog())
 
-        # on_success
         message = self._message_receiver.receive()
         self._response_handler.handle(message)
 

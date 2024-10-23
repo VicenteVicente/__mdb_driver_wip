@@ -11,6 +11,10 @@ from .socket_connection import SocketConnection
 
 
 class Result:
+    """
+    This class represents the result of a query
+    """
+
     def __init__(
         self,
         driver: "Driver",

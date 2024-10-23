@@ -1,6 +1,7 @@
 from .driver import Driver as _Driver
 from .millenniumdb_error import MillenniumDBError, ResultError
 
+
 __version__ = "0.0.1"
 
 

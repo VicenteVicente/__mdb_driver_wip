@@ -8,6 +8,10 @@ from .socket_connection import SocketConnection
 
 
 class MessageReceiver:
+    """
+    Represents the receiver of the incoming messages
+    """
+
     SEAL = 0x00_00
 
     def __init__(self, connection: SocketConnection):
@@ -16,6 +20,9 @@ class MessageReceiver:
         self._message_decoder = MessageDecoder(self._receiver_buffer)
 
     def receive(self) -> object:
+        """
+        Decode and return the incoming message
+        """
         # Decode chunks
         self._chunk_decoder.decode()
 

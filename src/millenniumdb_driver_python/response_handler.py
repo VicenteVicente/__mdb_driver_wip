@@ -5,11 +5,18 @@ from .millenniumdb_error import MillenniumDBError
 
 
 class ResponseHandler:
+    """
+    This class handles the responses coming from the server
+    """
+
     def __init__(self):
         self._current_observer: Dict[str, Callable] = None
         self._pending_observers: List[Dict[str, Callable]] = []
 
     def handle(self, message: Dict[str, object]) -> None:
+        """
+        Handle an incoming response
+        """
         match message["type"]:
             case protocol.ResponseType.SUCCESS:
                 self._callback("on_success", message["payload"])
@@ -29,12 +36,20 @@ class ResponseHandler:
                 raise NotImplementedError
 
     def add_observer(self, observer: Dict[str, Callable]) -> None:
+        """
+        Enqueue a new observer for handling a response
+
+        :param observer: that will handle the received data
+        """
         if self._current_observer is None:
             self._current_observer = observer
         else:
             self._pending_observers.append(observer)
 
     def _callback(self, callback_key: str, *args, **kwargs) -> None:
+        """
+        Call the observer with the given key and arguments
+        """
         if (
             self._current_observer is not None
             and callback_key in self._current_observer
@@ -42,6 +57,9 @@ class ResponseHandler:
             self._current_observer[callback_key](*args, **kwargs)
 
     def _next_observer(self):
+        """
+        Move to the next observer in the queue
+        """
         if len(self._pending_observers) > 0:
             self._current_observer = self._pending_observers.pop(0)
         else:

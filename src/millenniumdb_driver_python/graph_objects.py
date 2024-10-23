@@ -2,7 +2,15 @@ from typing import List
 
 
 class GraphNode:
+    """
+    Represents a node in the graph
+    """
+
     def __init__(self, id: str):
+        """
+        attributes:
+        id (str): The node identifier
+        """
         self.id = id
 
     def __str__(self):
@@ -13,7 +21,15 @@ class GraphNode:
 
 
 class GraphEdge:
+    """
+    Represents an edge in the graph
+    """
+
     def __init__(self, id: str):
+        """
+        attributes:
+        id (str): The edge identifier
+        """
         self.id = id
 
     def __str__(self):
@@ -24,7 +40,15 @@ class GraphEdge:
 
 
 class GraphAnon:
+    """
+    Represents an anonymous node in the graph
+    """
+
     def __init__(self, id: str):
+        """
+        attributes:
+        id (str): The anonymous node identifier
+        """
         self.id = id
 
     def __str__(self):
@@ -128,20 +152,45 @@ class DateTime:
 
 
 class GraphPathSegment:
+    """
+    Represents a segment in the path
+    """
+
     def __init__(self, from_: object, to: object, type: object, reverse: bool) -> None:
+        """
+        attributes:
+        from_ (object): The starting node of the segment
+        to (object): The ending node of the segment
+        type (object): The type of the segment
+        """
         self.from_ = from_
         self.to = to
         self.type = type
+
+        # Whether the segment is in reverse direction,
+        # for example the segment should be printed
+        # as `(to)<-[type]-(from)` instead of `(from)-[type]->(to)`
         self.reverse = reverse
 
 
 class GraphPath:
+    """
+    Represents a path in the graph
+    """
+
     def __init__(
         self,
         start: object,
         end: object,
         segments: List[GraphPathSegment],
     ) -> None:
+        """
+        attributes:
+        start (object): The starting node of the path
+        end (object): The ending node of the path
+        segments (List[GraphPathSegment]): The segments of the path
+        length (int): The number of segments in the path
+        """
         self.start = start
         self.end = end
         self.segments = segments
