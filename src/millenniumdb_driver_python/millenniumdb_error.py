@@ -4,3 +4,14 @@ class MillenniumDBError(Exception):
     """
 
     pass
+
+
+class ResultError(MillenniumDBError):
+    """
+    This specific error is thrown when an error occurs while processing a result
+    in order to be able to consume the results obtained so far
+    """
+
+    def __init__(self, result: "Result", *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.result: "Result" = result

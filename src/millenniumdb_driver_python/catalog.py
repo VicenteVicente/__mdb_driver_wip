@@ -60,7 +60,7 @@ class Catalog:
             self._version = summary["version"]
 
         def on_error(error) -> None:
-            raise MillenniumDBError(error)
+            raise error
 
         self._response_handler.add_observer(
             {"on_success": on_success, "on_error": on_error}

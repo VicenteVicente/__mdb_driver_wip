@@ -68,6 +68,7 @@ class SocketConnection:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.settimeout(self._connection_timeout)
             sock.connect((host, port))
+            sock.settimeout(None)
             return sock
         except socket.timeout as e:
             raise MillenniumDBError(
