@@ -62,7 +62,7 @@ Then you can send queries through your session
 """
 
 for filename in os.listdir(src_path):
-    if filename.endswith(".py") and filename not in ["__init__.py", "protocol.py"]:
+    if filename.endswith(".py") and filename != "__init__.py":
         module_name = filename[:-3]
         index_content += f"""
 {module_name.capitalize()} Module

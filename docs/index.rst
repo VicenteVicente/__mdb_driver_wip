@@ -108,6 +108,13 @@ Millenniumdb_error Module
    :undoc-members:
    :show-inheritance:
 
+Protocol Module
+===============================
+.. automodule:: millenniumdb_driver_python.protocol
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Record Module
 ===============================
 .. automodule:: millenniumdb_driver_python.record
