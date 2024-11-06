@@ -2,24 +2,28 @@ from . import protocol
 from .iobuffer import IOBuffer
 
 
-# This class is for build requests
 class RequestBuilder:
     """
-    This class is for build requests
-
+    This class is for build requests.
     """
 
     @staticmethod
     def encode_string(string: str) -> bytes:
+        """
+        :param string: The string to encode.
+        :type string: str
+        :return: The encoded string in bytes using utf-8.
+        """
         return string.encode("utf-8")
 
     @staticmethod
     def run(query: str) -> IOBuffer:
         """
-        Builds a request to execute a query
+        Builds a request to execute a query.
 
-        :param query: The query string to execute
-        :return: The encoded request
+        :param query: The query string to execute.
+        :type query: str
+        :return: The IOBuffer of the request.
         """
         query_bytes = RequestBuilder.encode_string(query)
         query_bytes_length = len(query_bytes)
@@ -34,7 +38,9 @@ class RequestBuilder:
     @staticmethod
     def catalog() -> IOBuffer:
         """
-        Builds a request to get the catalog
+        Builds a request to get the catalog.
+
+        :return: The IOBuffer of the request.
         """
         iobuffer = IOBuffer(5)
         iobuffer.write_uint32(len(iobuffer) - 4)
@@ -44,7 +50,13 @@ class RequestBuilder:
     @staticmethod
     def cancel(worker_index: int, cancellation_token: str) -> IOBuffer:
         """
-        Builds a request to cancel a query
+        Builds a request to cancel a query.
+
+        :param worker_index: The index of the worker.
+        :type worker_index: int
+        :param cancellation_token: The cancellation token.
+        :type cancellation_token: str
+        :return: The IOBuffer of the request.
         """
         cancellation_token_bytes = RequestBuilder.encode_string(cancellation_token)
         cancellation_token_bytes_length = len(cancellation_token_bytes)

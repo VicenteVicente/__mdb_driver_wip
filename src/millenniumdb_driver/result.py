@@ -12,7 +12,7 @@ from .socket_connection import SocketConnection
 
 class Result:
     """
-    This class represents the result of a query
+    This class represents the result of a query.
     """
 
     def __init__(
@@ -38,26 +38,47 @@ class Result:
         self._run(query, timeout)
 
     def variables(self) -> Tuple[str]:
+        """
+        :return: The list of variables in the result.
+        """
         return self._variables
 
     def records(self) -> List[Record]:
+        """
+        :return: The list of records in the result.
+        """
         return self._records
 
     def values(self) -> List[object]:
+        """
+        :return: The list of values in the result.
+        """
         return [record.values() for record in self._records]
 
     def data(self) -> List[Dict[str, object]]:
+        """
+        :return: The list of records in the result as dictionaries.
+        """
         return [record.to_dict() for record in self._records]
 
     def to_df(self) -> "DataFrame":
+        """
+        :return: The result as a pandas DataFrame.
+        """
         from pandas import DataFrame
 
         return DataFrame(self.data())
 
     def summary(self) -> object:
+        """
+        :return: The summary of the result.
+        """
         return self._summary
 
     def __iter__(self) -> Iterator[Record]:
+        """
+        :return: An iterator over the records in the result.
+        """
         return iter(self._records)
 
     def _try_cancel(self, timeout) -> None:

@@ -21,19 +21,17 @@ from .millenniumdb_error import MillenniumDBError
 
 class MessageDecoder:
     """
-    Represents the decoder of the incoming messages
+    Represents the decoder of the incoming messages.
     """
 
     def __init__(self, iobuffer: IOBuffer):
-        """
-        attributes:
-        _iobuffer (IOBuffer): The IOBuffer of the incoming
-        """
         self._iobuffer = iobuffer
 
     def decode(self) -> object:
         """
-        Decode the incoming message
+        Decode the incoming message, matching the type of
+        the data with the protocol.DataType enum and returning
+        the decoded data.
         """
         type_ = self._iobuffer.read_uint8()
 

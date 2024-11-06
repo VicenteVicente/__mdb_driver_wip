@@ -6,7 +6,7 @@ from .millenniumdb_error import MillenniumDBError
 
 class ResponseHandler:
     """
-    This class handles the responses coming from the server
+    This class handles the responses coming from the server.
     """
 
     def __init__(self):
@@ -15,7 +15,10 @@ class ResponseHandler:
 
     def handle(self, message: Dict[str, object]) -> None:
         """
-        Handle an incoming response
+        Handle an incoming response.
+
+        :param message: The incoming message.
+        :type message: Dict[str, object]
         """
         match message["type"]:
             case protocol.ResponseType.SUCCESS:
@@ -37,9 +40,10 @@ class ResponseHandler:
 
     def add_observer(self, observer: Dict[str, Callable]) -> None:
         """
-        Enqueue a new observer for handling a response
+        Enqueue a new observer for handling a response.
 
-        :param observer: that will handle the received data
+        :param observer: that will handle the received data.
+        :type observer: Dict[str, Callable
         """
         if self._current_observer is None:
             self._current_observer = observer
@@ -48,7 +52,10 @@ class ResponseHandler:
 
     def _callback(self, callback_key: str, *args, **kwargs) -> None:
         """
-        Call the observer with the given key and arguments
+        Call the observer with the given key and arguments.
+
+        :param callback_key: The key of the observer to call.
+        :type callback_key: str
         """
         if (
             self._current_observer is not None
@@ -58,7 +65,7 @@ class ResponseHandler:
 
     def _next_observer(self):
         """
-        Move to the next observer in the queue
+        Move to the next observer in the queue.
         """
         if len(self._pending_observers) > 0:
             self._current_observer = self._pending_observers.pop(0)

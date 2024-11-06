@@ -7,7 +7,7 @@ from .millenniumdb_error import MillenniumDBError
 
 class SocketConnection:
     """
-    Represents the socket connection to the server
+    Represents the socket connection to the server.
     """
 
     def __init__(
@@ -15,17 +15,23 @@ class SocketConnection:
         host: str,
         port: int,
     ):
+        """
+        Create a socket connection with the host and port.
+        """
         self._connection_timeout = protocol.DEFAULT_CONNECTION_TIMEOUT
         self._socket = self._create_socket(host, port)
         self._handshake()
 
     def sendall(self, iobuffer: IOBuffer) -> None:
         """
-        Send the data to the server
+        Send the data to the server.
         """
         self._socket.sendall(iobuffer.view[: iobuffer.num_used_bytes])
 
     def recvall_into(self, iobuffer: IOBuffer, num_bytes: int) -> None:
+        """
+        Receive the data from the server.
+        """
         end = iobuffer.num_used_bytes + num_bytes
         if end > len(iobuffer):
             iobuffer.extend(end - len(iobuffer))
@@ -43,7 +49,7 @@ class SocketConnection:
 
     def close(self) -> None:
         """
-        Close the socket connection
+        Close the socket connection.
         """
         try:
             self._socket.shutdown(socket.SHUT_RDWR)
@@ -55,9 +61,6 @@ class SocketConnection:
             pass
 
     def _handshake(self) -> None:
-        """
-        Perform the handshake with the server
-        """
         self._socket.sendall(protocol.DRIVER_PREAMBLE_BYTES)
         response = self._socket.recv(8)
         if response != protocol.SERVER_PREAMBLE_BYTES:
