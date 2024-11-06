@@ -1,9 +1,10 @@
 # MillenniumDB Driver
 ---
+Welcome to the official Python driver for the MillenniumDB! This driver allows you to easily interact with MillenniumDB directly from your Python applications.
 
-Here you can find the official Python driver for the [MillenniumDB server](https://github.com/MillenniumDB/MillenniumDB).
+For more information about the MillenniumDB server, check out the [MillenniumDB repository](https://github.com/MillenniumDB/MillenniumDB).
 
-Check out the driver for different languages!
+Explore drivers in other languages as well:
 
 - [MillenniumDB driver in JavaScript](https://github.com/MillenniumDB/MillenniumDB-driver-javascript)
 
